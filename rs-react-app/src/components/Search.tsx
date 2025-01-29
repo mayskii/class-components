@@ -32,6 +32,7 @@ class Search extends Component<SearchProps, SearchState> {
           type="text"
           value={this.state.searchTerm}
           onChange={this.handleSearchChange}
+          placeholder="Enter search term"
         />
         <button onClick={this.handleSearchSubmit}>Search</button>
       </div>
