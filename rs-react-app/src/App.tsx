@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Search from './components/Search';
+import CardList from './components/CardList';
 // import './App.css';
 
 interface AppState {
@@ -15,6 +16,7 @@ class App extends Component<{}, AppState> {
     return (
       <div>
         <Search />
+        <CardList />
       </div>
     );
   }
