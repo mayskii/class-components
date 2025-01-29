@@ -3,7 +3,8 @@ import Search from './components/Search';
 import CardList from './components/CardList';
 import Loader from './components/Loader';
 import axios from 'axios';
-// import './App.css';
+import ErrorBoundary from './components/ErrorBoundary';
+import './App.css';
 
 interface AppState {
   items: { name: string; description: string }[];
@@ -45,17 +46,27 @@ class App extends Component<object, AppState> {
     this.fetchData(searchTerm);
   };
 
-  
+  componentDidMount(): void {
+    const searchTerm = localStorage.getItem('searchTerm');
+    if (searchTerm) {
+      this.fetchData(searchTerm);
+    } else {
+      this.fetchData('');
+    }
+  }
 
   render() {
     const { items, isLoading, error } = this.state;
     return (
-      <div>
-        <h1>Search App</h1>
-        <Search onSearch={this.handleSearch} />
-        {isLoading && <Loader />}
-        <CardList items={items} />
-      </div>
+      <ErrorBoundary>
+        <div>
+          <h1>Search App</h1>
+          <Search onSearch={this.handleSearch} />
+          {isLoading && <Loader />}
+          {error && <p>{error}</p>}
+          <CardList items={items} />
+        </div>
+      </ErrorBoundary>
     );
   }
 }
