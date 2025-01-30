@@ -7,16 +7,16 @@ interface Item {
 }
 
 interface CardListProps {
-  items: Item[];
+  results: Item[];
 }
 
-const CardList: React.FC<CardListProps> = ({ items }) => {
+const CardList: React.FC<CardListProps> = ({ results }) => {
   return (
     <div>
-      {items.length === 0 ? (
+      {results.length === 0 ? (
         <p>No result found</p>
       ) : (
-        items.map((item, index) => (
+        results.map((item, index) => (
           <Card key={index} name={item.name} description={item.description} />
         ))
       )}

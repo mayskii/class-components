@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 interface SearchProps {
-  onSearch: (searchTerm: string) => void;
+  onSearch: (term: string) => void;
 }
 
 interface SearchState {
@@ -21,20 +21,23 @@ class Search extends Component<SearchProps, SearchState> {
     const { searchTerm } = this.state;
     if (searchTerm) {
       localStorage.setItem('searchTerm', this.state.searchTerm);
-      this.props.onSearch(this.state.searchTerm);
+      this.props.onSearch(searchTerm);
     }
   };
 
   render() {
     return (
-      <div>
+      <div className="search-container">
         <input
+          className="search-input"
           type="text"
           value={this.state.searchTerm}
           onChange={this.handleSearchChange}
           placeholder="Enter search term"
         />
-        <button onClick={this.handleSearchSubmit}>Search</button>
+        <button className="search-button" onClick={this.handleSearchSubmit}>
+          Search
+        </button>
       </div>
     );
   }
