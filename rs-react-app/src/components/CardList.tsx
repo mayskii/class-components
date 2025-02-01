@@ -1,5 +1,4 @@
 import React from 'react';
-import Card from './Card';
 
 interface Item {
   name: string;
@@ -11,15 +10,31 @@ interface CardListProps {
 }
 
 const CardList: React.FC<CardListProps> = ({ results }) => {
+  console.log('Rendering results:', results);
   return (
-    <div>
-      {results.length === 0 ? (
-        <p>No result found</p>
-      ) : (
-        results.map((item, index) => (
-          <Card key={index} name={item.name} description={item.description} />
-        ))
-      )}
+    <div className="card-list-container">
+      <table className="card-table">
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Item Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {results.length === 0 ? (
+            <tr>
+              <td colSpan={2}>No result found</td>
+            </tr>
+          ) : (
+            results.map((item, index) => (
+              <tr key={index}>
+                <td>{item.name}</td>
+                <td>{item.description}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

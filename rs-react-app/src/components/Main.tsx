@@ -28,7 +28,7 @@ class Main extends Component<MainProps, MainState> {
     this.setState({ loading: true, error: null });
 
     const query = searchTerm.trim()
-      ? `?limit=10&offset=0`
+      ? `?limit=10&offset=${searchTerm}`
       : `?limit=10&offset=0`;
 
     axios

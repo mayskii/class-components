@@ -10,12 +10,16 @@ interface AppState {
 
 class App extends Component<object, AppState> {
   state: AppState = {
-    searchTerm: '',
+    searchTerm: localStorage.getItem('searchTerm') || '',
   };
 
   handleSearch = (term: string) => {
     this.setState({ searchTerm: term });
     localStorage.setItem('searchTerm', term);
+  };
+
+  throwError = () => {
+    throw new Error('This is error for testing');
   };
 
   render() {
@@ -24,10 +28,13 @@ class App extends Component<object, AppState> {
       <div className="app-container">
         <ErrorBoundary>
           <div className="top-controls">
-            <Search onSearch={this.handleSearch} />
+            <Search searchTerm={searchTerm} onSearch={this.handleSearch} />
           </div>
           <Main searchTerm={searchTerm} />
         </ErrorBoundary>
+        <button className="error-button" onClick={this.throwError}>
+          Throw Error
+        </button>
       </div>
     );
   }

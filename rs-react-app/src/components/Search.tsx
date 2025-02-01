@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 interface SearchProps {
   onSearch: (term: string) => void;
+  searchTerm: string;
 }
 
 interface SearchState {
@@ -10,18 +11,33 @@ interface SearchState {
 
 class Search extends Component<SearchProps, SearchState> {
   state: SearchState = {
-    searchTerm: localStorage.getItem('searchTerm') || '',
+    searchTerm: '',
   };
 
+  componentDidMount(): void {
+    const savedSearchTerm = localStorage.getItem('searchTerm');
+    if (savedSearchTerm) {
+      this.setState({ searchTerm: savedSearchTerm });
+    }
+  }
+
   handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchTerm: event.target.value.trim() });
+    const searchTerm = event.target.value;
+    this.setState({ searchTerm });
   };
 
   handleSearchSubmit = () => {
     const { searchTerm } = this.state;
-    if (searchTerm) {
-      localStorage.setItem('searchTerm', this.state.searchTerm);
-      this.props.onSearch(searchTerm);
+    const trimmedTerm = searchTerm.trim();
+
+    if (trimmedTerm) {
+      localStorage.setItem('searchTerm', trimmedTerm);
+      this.props.onSearch(trimmedTerm);
+    } else {
+      const savedSearchTerm = localStorage.getItem('searchTerm');
+      if (savedSearchTerm) {
+        this.props.onSearch(savedSearchTerm);
+      }
     }
   };
 
