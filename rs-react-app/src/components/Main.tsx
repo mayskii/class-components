@@ -27,17 +27,17 @@ class Main extends Component<MainProps, MainState> {
   fetchData = (searchTerm: string) => {
     this.setState({ loading: true, error: null });
 
-    const query = searchTerm.trim()
-      ? `?limit=10&offset=${searchTerm}`
-      : `?limit=10&offset=0`;
-
     axios
-      .get(`https://pokeapi.co/api/v2/pokemon${query}`)
+      .get(`https://pokeapi.co/api/v2/pokemon?limit=1000`)
       .then((response) => {
         if (response.data && Array.isArray(response.data.results)) {
+          const filteredResults = response.data.results.filter(
+            (pokemon: Pokemon) =>
+              pokemon.name.toLowerCase().includes(searchTerm.toLowerCase()) // фильтрация по имени
+          );
           this.setState({
             loading: false,
-            results: response.data.results,
+            results: filteredResults,
           });
         } else {
           this.setState({

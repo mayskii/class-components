@@ -9,15 +9,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
   padding: 20px;
-  background-color: #201f1f;
-  border: 1px solid white;
+  background-color: #999595;
+  border: 1px solid rgb(9, 9, 9);
 }
 
 .top-controls {
   display: flex;
-  gap: 10px;
   margin-bottom: 20px;
   justify-content: space-between;
   align-items: center;
@@ -37,6 +35,8 @@
   font-size: 16px;
   width: 80%;
   border: 1px solid #ccc;
+  background-color: #ccc;
+  color: black;
   border-radius: 4px;
 }
 
@@ -91,6 +91,24 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.card-list-container {
+  width: 100%;
+  padding: 10px;
+}
+
+.card-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.card-table th, .card-table td {
+  color: white;
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 .error-message {

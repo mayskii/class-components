@@ -33,11 +33,6 @@ class Search extends Component<SearchProps, SearchState> {
     if (trimmedTerm) {
       localStorage.setItem('searchTerm', trimmedTerm);
       this.props.onSearch(trimmedTerm);
-    } else {
-      const savedSearchTerm = localStorage.getItem('searchTerm');
-      if (savedSearchTerm) {
-        this.props.onSearch(savedSearchTerm);
-      }
     }
   };
 
