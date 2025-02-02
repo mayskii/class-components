@@ -14,12 +14,12 @@ class Search extends Component<SearchProps, SearchState> {
     searchTerm: '',
   };
 
-  componentDidMount(): void {
-    const savedSearchTerm = localStorage.getItem('searchTerm');
-    if (savedSearchTerm) {
-      this.setState({ searchTerm: savedSearchTerm });
-    }
-  }
+  //   componentDidMount(): void {
+  //     const savedSearchTerm = localStorage.getItem('searchTerm');
+  //     if (savedSearchTerm) {
+  //       this.setState({ searchTerm: savedSearchTerm });
+  //     }
+  //   }
 
   handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
