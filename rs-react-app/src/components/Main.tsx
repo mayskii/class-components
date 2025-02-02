@@ -12,6 +12,10 @@ interface MainState {
   loading: boolean;
   error: string | null;
   results: Pokemon[];
+  currentPage: number;
+  totalResults: number;
+  resultsPerPage: number;
+  allResults: Pokemon[];
 }
 
 interface MainProps {
@@ -55,6 +59,10 @@ class Main extends Component<MainProps, MainState> {
     loading: false,
     error: null,
     results: [],
+    currentPage: 1,
+    totalResults: 0,
+    resultsPerPage: 20,
+    allResults: [],
   };
 
   fetchPokemonDetails = async (url: string): Promise<PokemonDetails> => {
@@ -97,35 +105,41 @@ class Main extends Component<MainProps, MainState> {
     }
   };
 
-  fetchData = (searchTerm: string) => {
+  fetchData = (searchTerm: string, page: number) => {
     this.setState({ loading: true, error: null });
+
+    const { resultsPerPage } = this.state;
+    const offset = (page - 1) * resultsPerPage;
 
     axios
       .get(`https://pokeapi.co/api/v2/pokemon?limit=1000`)
       .then(async (response) => {
-        if (response.data && Array.isArray(response.data.results)) {
-          const filteredResults = await Promise.all(
-            response.data.results
-              .filter((pokemon: Pokemon) =>
-                pokemon.name
-                  .toLocaleLowerCase()
-                  .includes(searchTerm.toLocaleLowerCase())
-              )
-              .map(async (pokemon: Pokemon) => {
-                const description = await this.fetchPokemonDetails(pokemon.url);
-                return { ...pokemon, description };
-              })
-          );
-          this.setState({
-            loading: false,
-            results: filteredResults,
-          });
-        } else {
-          this.setState({
-            loading: false,
-            error: 'Unexpected response structure.',
-          });
-        }
+        const allResults = response.data.results;
+
+        const filteredResults = allResults.filter((pokemon: Pokemon) =>
+          pokemon.name
+            .toLocaleLowerCase()
+            .includes(searchTerm.toLocaleLowerCase())
+        );
+
+        const resultsWithDetails = await Promise.all(
+          filteredResults.map(async (pokemon: Pokemon) => {
+            const description = await this.fetchPokemonDetails(pokemon.url);
+            return { ...pokemon, description };
+          })
+        );
+        const totalFilteredResults = filteredResults.length;
+        const paginatedResults = resultsWithDetails.slice(
+          offset,
+          offset + resultsPerPage
+        );
+
+        this.setState({
+          loading: false,
+          results: paginatedResults,
+          totalResults: totalFilteredResults,
+          allResults: filteredResults,
+        });
       })
       .catch((error: unknown) => {
         if (error instanceof Error) {
@@ -142,19 +156,48 @@ class Main extends Component<MainProps, MainState> {
       });
   };
 
+  handleNextPage = () => {
+    this.setState(
+      (prevState) => ({ currentPage: prevState.currentPage + 1 }),
+      () => {
+        this.fetchData(this.props.searchTerm, this.state.currentPage);
+      }
+    );
+  };
+
+  handlePreviousPage = () => {
+    this.setState(
+      (prevState) => ({ currentPage: prevState.currentPage - 1 }),
+      () => {
+        this.fetchData(this.props.searchTerm, this.state.currentPage);
+      }
+    );
+  };
+
   componentDidMount(): void {
     const searchTerm = localStorage.getItem('searchTerm') || '';
-    this.fetchData(searchTerm);
+    this.fetchData(searchTerm, this.state.currentPage);
   }
 
   componentDidUpdate(prevProps: MainProps): void {
     if (prevProps.searchTerm !== this.props.searchTerm) {
-      this.fetchData(this.props.searchTerm);
+      this.setState({ currentPage: 1 }, () => {
+        this.fetchData(this.props.searchTerm, 1);
+      });
     }
   }
 
   render() {
-    const { loading, error, results } = this.state;
+    const {
+      loading,
+      error,
+      results,
+      currentPage,
+      totalResults,
+      resultsPerPage,
+    } = this.state;
+    const totalPages = Math.ceil(totalResults / resultsPerPage);
+
     return (
       <div className="results">
         {loading && (
@@ -167,8 +210,26 @@ class Main extends Component<MainProps, MainState> {
           <CardList results={results} />
         )}
         {!loading && !error && results.length === 0 && (
-          <div>No results found.</div>
+          <div>No results found</div>
         )}
+        <div className="pagination-controls">
+          {currentPage > 1 && (
+            <button
+              onClick={this.handlePreviousPage}
+              className="pagination-button"
+            >
+              Previous
+            </button>
+          )}
+          <span className="page-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          {currentPage < totalPages && (
+            <button onClick={this.handleNextPage} className="pagination-button">
+              Next
+            </button>
+          )}
+        </div>
       </div>
     );
   }
