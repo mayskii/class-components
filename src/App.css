@@ -67,7 +67,7 @@
   flex-direction: column;
   color: #ffffff;
   font-size: 20px;
-  background-color:  hsla(0, 0%, 0%, 0.77);;
+  background-color: hsla(0, 0%, 0%, 0.77);
   margin: 5px;
   padding: 20px;
   border-radius: 8px;
@@ -98,8 +98,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .card-list-container {
@@ -113,7 +117,8 @@
   margin-top: 10px;
 }
 
-.card-table th, .card-table td {
+.card-table th,
+.card-table td {
   color: white;
   padding: 12px 20px;
   border: 1px solid #ddd;
