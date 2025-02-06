@@ -136,14 +136,18 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
   };
 
   useEffect(() => {
-    const searchTermFromStorage = localStorage.getItem('searcTerm') || '';
-    fetchData(searchTermFromStorage, currentPage);
-  }, [currentPage]);
+    fetchData(searchTerm, currentPage);
+  }, [searchTerm, currentPage]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-    fetchData(searchTerm, 1);
-  }, [searchTerm]);
+  // useEffect(() => {
+  //   const searchTermFromStorage = localStorage.getItem('searcTerm') || '';
+  //   fetchData(searchTermFromStorage, currentPage);
+  // }, [currentPage]);
+
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  //   fetchData(searchTerm, 1);
+  // }, [searchTerm]);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);

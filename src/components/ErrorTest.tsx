@@ -1,10 +1,8 @@
-import { Component } from 'react';
+import React from 'react';
 
-class ErrorTest extends Component {
-  render() {
-    throw new Error('This is a test error from ErrorTest!');
-    return null;
-  }
-}
+const ErrorTest: React.FC = () => {
+  throw new Error('This is a test error from ErrorTest!');
+  return null;
+};
 
 export default ErrorTest;
