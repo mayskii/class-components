@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import CardList from './CardList';
 import axios from 'axios';
 
@@ -6,16 +6,6 @@ interface Pokemon {
   name: string;
   url: string;
   description?: PokemonDetails;
-}
-
-interface MainState {
-  loading: boolean;
-  error: string | null;
-  results: Pokemon[];
-  currentPage: number;
-  totalResults: number;
-  resultsPerPage: number;
-  allResults: Pokemon[];
 }
 
 interface MainProps {
@@ -54,18 +44,15 @@ interface PokemonDetails {
   stats: string;
 }
 
-class Main extends Component<MainProps, MainState> {
-  state = {
-    loading: false,
-    error: null,
-    results: [],
-    currentPage: 1,
-    totalResults: 0,
-    resultsPerPage: 20,
-    allResults: [],
-  };
+const Main: React.FC<MainProps> = ({ searchTerm }) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<Pokemon[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalResults, setTotalResults] = useState<number>(0);
+  const [resultsPerPage] = useState<number>(20);
 
-  fetchPokemonDetails = async (url: string): Promise<PokemonDetails> => {
+  const fetchPokemonDetails = async (url: string): Promise<PokemonDetails> => {
     try {
       const response = await axios.get(url);
 
@@ -105,10 +92,10 @@ class Main extends Component<MainProps, MainState> {
     }
   };
 
-  fetchData = (searchTerm: string, page: number) => {
-    this.setState({ loading: true, error: null });
+  const fetchData = (searchTerm: string, page: number) => {
+    setLoading(true);
+    setError(null);
 
-    const { resultsPerPage } = this.state;
     const offset = (page - 1) * resultsPerPage;
 
     axios
@@ -124,7 +111,7 @@ class Main extends Component<MainProps, MainState> {
 
         const resultsWithDetails = await Promise.all(
           filteredResults.map(async (pokemon: Pokemon) => {
-            const description = await this.fetchPokemonDetails(pokemon.url);
+            const description = await fetchPokemonDetails(pokemon.url);
             return { ...pokemon, description };
           })
         );
@@ -134,105 +121,71 @@ class Main extends Component<MainProps, MainState> {
           offset + resultsPerPage
         );
 
-        this.setState({
-          loading: false,
-          results: paginatedResults,
-          totalResults: totalFilteredResults,
-          allResults: filteredResults,
-        });
+        setLoading(false);
+        setResults(paginatedResults);
+        setTotalResults(totalFilteredResults);
       })
       .catch((error: unknown) => {
+        setLoading(false);
         if (error instanceof Error) {
-          this.setState({
-            loading: false,
-            error: error.message || 'An error occurred',
-          });
+          setError(error.message || 'An error occurred');
         } else {
-          this.setState({
-            loading: false,
-            error: 'An unknown error occurred',
-          });
+          setError('An unknown error occurred');
         }
       });
   };
 
-  handleNextPage = () => {
-    this.setState(
-      (prevState) => ({ currentPage: prevState.currentPage + 1 }),
-      () => {
-        this.fetchData(this.props.searchTerm, this.state.currentPage);
-      }
-    );
+  useEffect(() => {
+    const searchTermFromStorage = localStorage.getItem('searcTerm') || '';
+    fetchData(searchTermFromStorage, currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchData(searchTerm, 1);
+  }, [searchTerm]);
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
   };
 
-  handlePreviousPage = () => {
-    this.setState(
-      (prevState) => ({ currentPage: prevState.currentPage - 1 }),
-      () => {
-        this.fetchData(this.props.searchTerm, this.state.currentPage);
-      }
-    );
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
   };
 
-  componentDidMount(): void {
-    const searchTerm = localStorage.getItem('searchTerm') || '';
-    this.fetchData(searchTerm, this.state.currentPage);
-  }
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
 
-  componentDidUpdate(prevProps: MainProps): void {
-    if (prevProps.searchTerm !== this.props.searchTerm) {
-      this.setState({ currentPage: 1 }, () => {
-        this.fetchData(this.props.searchTerm, 1);
-      });
-    }
-  }
-
-  render() {
-    const {
-      loading,
-      error,
-      results,
-      currentPage,
-      totalResults,
-      resultsPerPage,
-    } = this.state;
-    const totalPages = Math.ceil(totalResults / resultsPerPage);
-
-    return (
-      <div className="results">
-        {loading && (
-          <div className="loader">
-            <div className="spinner"></div>
-          </div>
-        )}
-        {error && <div className="error-message">{error}</div>}
-        {!loading && !error && results.length > 0 && (
-          <CardList results={results} />
-        )}
-        {!loading && !error && results.length === 0 && (
-          <div>No results found</div>
-        )}
-        <div className="pagination-controls">
-          {currentPage > 1 && (
-            <button
-              onClick={this.handlePreviousPage}
-              className="pagination-button"
-            >
-              Previous
-            </button>
-          )}
-          <span className="page-info">
-            Page {currentPage} of {totalPages}
-          </span>
-          {currentPage < totalPages && (
-            <button onClick={this.handleNextPage} className="pagination-button">
-              Next
-            </button>
-          )}
+  return (
+    <div className="results">
+      {loading && (
+        <div className="loader">
+          <div className="spinner"></div>
         </div>
+      )}
+      {error && <div className="error-message">{error}</div>}
+      {!loading && !error && results.length > 0 && (
+        <CardList results={results} />
+      )}
+      {!loading && !error && results.length === 0 && (
+        <div>No results found</div>
+      )}
+      <div className="pagination-controls">
+        {currentPage > 1 && (
+          <button onClick={handlePreviousPage} className="pagination-button">
+            Previous
+          </button>
+        )}
+        <span className="page-info">
+          Page {currentPage} of {totalPages}
+        </span>
+        {currentPage < totalPages && (
+          <button onClick={handleNextPage} className="pagination-button">
+            Next
+          </button>
+        )}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default Main;
