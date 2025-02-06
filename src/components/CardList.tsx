@@ -6,16 +6,13 @@ interface PokemonDetails {
   abilities: string;
   stats: string;
 }
-
 interface Pokemon {
   name: string;
   description?: PokemonDetails;
 }
-
 interface CardListProps {
   results: Pokemon[];
 }
-
 const CardList: React.FC<CardListProps> = ({ results }) => {
   return (
     <div className="card-list-container">
