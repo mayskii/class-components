@@ -17,7 +17,6 @@ interface CardListProps {
 }
 
 const CardList: React.FC<CardListProps> = ({ results }) => {
-  console.log('Rendering results:', results);
   return (
     <div className="card-list-container">
       <table className="card-table">

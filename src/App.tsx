@@ -2,15 +2,18 @@ import { Component } from 'react';
 import Search from './components/Search';
 import Main from './components/Main';
 import ErrorBoundary from './components/ErrorBoundary';
+import ErrorTest from './components/ErrorTest';
 import './App.css';
 
 interface AppState {
   searchTerm: string;
+  hasError: boolean;
 }
 
 class App extends Component<object, AppState> {
   state: AppState = {
     searchTerm: localStorage.getItem('searchTerm') || '',
+    hasError: false,
   };
 
   handleSearch = (term: string) => {
@@ -18,24 +21,32 @@ class App extends Component<object, AppState> {
     localStorage.setItem('searchTerm', term);
   };
 
-  throwError = () => {
-    throw new Error('This is error for testing');
+  triggerError = () => {
+    this.setState({
+      hasError: true,
+    });
   };
 
+  resetError = () => {
+    this.setState({
+      hasError: false,
+    });
+  };
   render() {
-    const { searchTerm } = this.state;
+    const { searchTerm, hasError } = this.state;
     return (
-      <div className="app-container">
-        <ErrorBoundary>
+      <ErrorBoundary resetError={this.resetError}>
+        <div className="app-container">
           <div className="top-controls">
             <Search searchTerm={searchTerm} onSearch={this.handleSearch} />
           </div>
           <Main searchTerm={searchTerm} />
-        </ErrorBoundary>
-        <button className="error-button" onClick={this.throwError}>
-          Throw Error
-        </button>
-      </div>
+          <button className="error-button" onClick={this.triggerError}>
+            Throw Error
+          </button>
+          {hasError && <ErrorTest />}
+        </div>
+      </ErrorBoundary>
     );
   }
 }
