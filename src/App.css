@@ -1,0 +1,213 @@
+* {
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #232e41, #616d85);
+  border-radius: 8px;
+}
+
+.top-controls {
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-radius: 8px;
+  background-color: hsla(0, 0%, 0%, 0.77);
+}
+
+.search-container {
+  display: flex;
+  width: 100%;
+  gap: 40px;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  border-radius: 4px;
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  border: 1px solid #ccc;
+  background-color: #f5f1f1;
+  color: black;
+  border-radius: 5px;
+  margin-left: 0;
+}
+
+.search-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #154a6e;
+  color: white;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #75a4c4;
+  color: black;
+}
+
+.results {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
+  font-size: 20px;
+  background-color: hsla(0, 0%, 0%, 0.77);
+  margin: 5px;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.card-list-container {
+  width: 100%;
+  padding: 10px;
+}
+
+.card-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.card-table th,
+.card-table td {
+  color: white;
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #201f1f;
+  border: 1px solid black;
+}
+
+.error-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #154a6e;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-right: 0;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.error-button:hover {
+  background-color: #75a4c4;
+  color: black;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #154a6e;
+  color: white;
+  cursor: pointer;
+  margin: 0 10px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover {
+  background-color: #75a4c4;
+  color: black;
+}
+
+.error-boundary {
+  padding: 50px;
+  background-color: white;
+  color: rgb(170, 51, 51);
+  border-radius: 8px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.error-boundary h2 {
+  font-size: 26px;
+}
+
+.error-boundary p {
+  font-size: 18px;
+}
+
+.error-boundary details {
+  margin-top: 15px;
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.error-boundary button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 40px;
+  background-color: #154a6e;
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.error-boundary button:hover {
+  background-color: #75a4c4;
+}
