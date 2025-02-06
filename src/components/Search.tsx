@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
+import useStorageSearch from '../hooks/useSrorageSearch';
 
 interface SearchProps {
   onSearch: (term: string) => void;
-  searchTerm: string;
 }
 
-const Search: React.FC<SearchProps> = ({ onSearch, searchTerm }) => {
-  const [term, setTerm] = useState(searchTerm);
+const Search: React.FC<SearchProps> = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTerm(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
   const handleSearchSubmit = () => {
-    const trimmedTerm = term.trim();
+    const trimmedTerm = searchTerm.trim();
 
     if (trimmedTerm) {
       localStorage.setItem('searchTerm', trimmedTerm);
@@ -26,7 +26,7 @@ const Search: React.FC<SearchProps> = ({ onSearch, searchTerm }) => {
       <input
         className="search-input"
         type="text"
-        value={term}
+        value={searchTerm}
         onChange={handleSearchChange}
         placeholder="Enter search term"
       />

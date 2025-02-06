@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import CardList from './CardList';
 import axios from 'axios';
 
@@ -92,62 +92,57 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
     }
   };
 
-  const fetchData = (searchTerm: string, page: number) => {
-    setLoading(true);
-    setError(null);
+  const fetchData = useCallback(
+    (searchTerm: string, page: number) => {
+      setLoading(true);
+      setError(null);
 
-    const offset = (page - 1) * resultsPerPage;
+      const offset = (page - 1) * resultsPerPage;
 
-    axios
-      .get(`https://pokeapi.co/api/v2/pokemon?limit=1000`)
-      .then(async (response) => {
-        const allResults = response.data.results;
+      axios
+        .get(`https://pokeapi.co/api/v2/pokemon?limit=1000`)
+        .then(async (response) => {
+          const allResults = response.data.results;
 
-        const filteredResults = allResults.filter((pokemon: Pokemon) =>
-          pokemon.name
-            .toLocaleLowerCase()
-            .includes(searchTerm.toLocaleLowerCase())
-        );
+          const filteredResults = allResults.filter((pokemon: Pokemon) =>
+            pokemon.name
+              .toLocaleLowerCase()
+              .includes(searchTerm.toLocaleLowerCase())
+          );
 
-        const resultsWithDetails = await Promise.all(
-          filteredResults.map(async (pokemon: Pokemon) => {
-            const description = await fetchPokemonDetails(pokemon.url);
-            return { ...pokemon, description };
-          })
-        );
-        const totalFilteredResults = filteredResults.length;
-        const paginatedResults = resultsWithDetails.slice(
-          offset,
-          offset + resultsPerPage
-        );
+          const resultsWithDetails = await Promise.all(
+            filteredResults.map(async (pokemon: Pokemon) => {
+              const description = await fetchPokemonDetails(pokemon.url);
+              return { ...pokemon, description };
+            })
+          );
+          const totalFilteredResults = filteredResults.length;
+          const paginatedResults = resultsWithDetails.slice(
+            offset,
+            offset + resultsPerPage
+          );
 
-        setLoading(false);
-        setResults(paginatedResults);
-        setTotalResults(totalFilteredResults);
-      })
-      .catch((error: unknown) => {
-        setLoading(false);
-        if (error instanceof Error) {
-          setError(error.message || 'An error occurred');
-        } else {
-          setError('An unknown error occurred');
-        }
-      });
-  };
+          setLoading(false);
+          setResults(paginatedResults);
+          setTotalResults(totalFilteredResults);
+        })
+        .catch((error: unknown) => {
+          setLoading(false);
+          if (error instanceof Error) {
+            setError(error.message || 'An error occurred');
+          } else {
+            setError('An unknown error occurred');
+          }
+        });
+    },
+    [resultsPerPage]
+  );
 
   useEffect(() => {
-    fetchData(searchTerm, currentPage);
-  }, [searchTerm, currentPage]);
-
-  // useEffect(() => {
-  //   const searchTermFromStorage = localStorage.getItem('searcTerm') || '';
-  //   fetchData(searchTermFromStorage, currentPage);
-  // }, [currentPage]);
-
-  // useEffect(() => {
-  //   setCurrentPage(1);
-  //   fetchData(searchTerm, 1);
-  // }, [searchTerm]);
+    if (searchTerm) {
+      fetchData(searchTerm, currentPage);
+    }
+  }, [searchTerm, currentPage, fetchData]);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);

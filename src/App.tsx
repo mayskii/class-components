@@ -3,17 +3,15 @@ import Search from './components/Search';
 import Main from './components/Main';
 import ErrorBoundary from './components/ErrorBoundary';
 import ErrorTest from './components/ErrorTest';
+import useStorageSearch from './hooks/useSrorageSearch';
 import './App.css';
 
 const App: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>(
-    localStorage.getItem('searchTerm') || ''
-  );
+  const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
   const [hasError, setHasError] = useState<boolean>(false);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    localStorage.setItem('searchTerm', term);
   };
 
   const triggerError = () => {
@@ -28,7 +26,7 @@ const App: React.FC = () => {
     <ErrorBoundary resetError={resetError}>
       <div className="app-container">
         <div className="top-controls">
-          <Search searchTerm={searchTerm} onSearch={handleSearch} />
+          <Search onSearch={handleSearch} />
         </div>
         <Main searchTerm={searchTerm} />
         <button className="error-button" onClick={triggerError}>
