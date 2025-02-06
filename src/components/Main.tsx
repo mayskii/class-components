@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import CardList from './CardList';
 import axios from 'axios';
 
@@ -45,6 +46,7 @@ interface PokemonDetails {
 }
 
 const Main: React.FC<MainProps> = ({ searchTerm }) => {
+  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Pokemon[]>([]);
@@ -52,45 +54,48 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
   const [totalResults, setTotalResults] = useState<number>(0);
   const [resultsPerPage] = useState<number>(20);
 
-  const fetchPokemonDetails = async (url: string): Promise<PokemonDetails> => {
-    try {
-      const response = await axios.get(url);
+  const fetchPokemonDetails = useCallback(
+    async (url: string): Promise<PokemonDetails> => {
+      try {
+        const response = await axios.get(url);
 
-      const flavorTextEntries: FlavorTextEntry[] =
-        response.data.flavor_text_entries;
+        const flavorTextEntries: FlavorTextEntry[] =
+          response.data.flavor_text_entries;
 
-      const description =
-        flavorTextEntries?.find((entry) => entry.language.name === 'en')
-          ?.flavor_text || 'No description avalable';
+        const description =
+          flavorTextEntries?.find((entry) => entry.language.name === 'en')
+            ?.flavor_text || 'No description avalable';
 
-      const types = response.data.types
-        .map((type: Type) => type.type.name)
-        .join(', ');
+        const types = response.data.types
+          .map((type: Type) => type.type.name)
+          .join(', ');
 
-      const abilities = response.data.abilities
-        .map((ability: Ability) => ability.ability.name)
-        .join(', ');
+        const abilities = response.data.abilities
+          .map((ability: Ability) => ability.ability.name)
+          .join(', ');
 
-      const stats = response.data.stats
-        .map((stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`)
-        .join(', ');
+        const stats = response.data.stats
+          .map((stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`)
+          .join(', ');
 
-      return {
-        description,
-        types,
-        abilities,
-        stats,
-      };
-    } catch (error) {
-      console.error('Error fetching details:', error);
-      return {
-        description: 'Description not available',
-        types: 'Types not available',
-        abilities: 'Abilities not available',
-        stats: 'Stats not available',
-      };
-    }
-  };
+        return {
+          description,
+          types,
+          abilities,
+          stats,
+        };
+      } catch (error) {
+        console.error('Error fetching details:', error);
+        return {
+          description: 'Description not available',
+          types: 'Types not available',
+          abilities: 'Abilities not available',
+          stats: 'Stats not available',
+        };
+      }
+    },
+    []
+  );
 
   const fetchData = useCallback(
     (searchTerm: string, page: number) => {
@@ -138,11 +143,38 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
     [resultsPerPage]
   );
 
+  const fetchPokemonById = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(
+          `https://pokeapi.co/api/v2/pokemon/${id}`
+        );
+        const details = await fetchPokemonDetails(response.data.url);
+        setLoading(false);
+        setResults([
+          {
+            name: response.data.name,
+            url: response.data.url,
+            description: details,
+          },
+        ]);
+      } catch {
+        setLoading(false);
+        setError('Pokemon not found');
+      }
+    },
+    [fetchPokemonDetails]
+  );
+
   useEffect(() => {
-    if (searchTerm) {
+    if (id) {
+      fetchPokemonById(id);
+    } else if (searchTerm) {
       fetchData(searchTerm, currentPage);
     }
-  }, [searchTerm, currentPage, fetchData]);
+  }, [searchTerm, currentPage, id, fetchData, fetchPokemonById]);
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => prevPage + 1);

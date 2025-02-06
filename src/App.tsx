@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Search from './components/Search';
 import Main from './components/Main';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -24,16 +25,32 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary resetError={resetError}>
-      <div className="app-container">
-        <div className="top-controls">
-          <Search onSearch={handleSearch} />
+      <Router>
+        <div className="app-container">
+          <div className="top-controls">
+            <Search onSearch={handleSearch} />
+          </div>
+          <Routes>
+            <Route
+              path="/class-components/"
+              element={<Main searchTerm={searchTerm} />}
+            />
+            <Route
+              path="/class-components/search"
+              element={<Main searchTerm={searchTerm} />}
+            />
+            <Route
+              path="/class-components/details/:id"
+              element={<Main searchTerm={searchTerm} />}
+            />
+          </Routes>
+
+          <button className="error-button" onClick={triggerError}>
+            Throw Error
+          </button>
+          {hasError && <ErrorTest />}
         </div>
-        <Main searchTerm={searchTerm} />
-        <button className="error-button" onClick={triggerError}>
-          Throw Error
-        </button>
-        {hasError && <ErrorTest />}
-      </div>
+      </Router>
     </ErrorBoundary>
   );
 };
