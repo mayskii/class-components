@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CardList from './CardList';
+import Search from './Search';
 import axios from 'axios';
+import ErrorTest from './ErrorTest';
+import useStorageSearch from '../hooks/useSrorageSearch';
 
 interface Pokemon {
   name: string;
@@ -45,7 +48,7 @@ interface PokemonDetails {
   stats: string;
 }
 
-const Main: React.FC<MainProps> = ({ searchTerm }) => {
+const Main: React.FC<MainProps> = () => {
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +56,9 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalResults, setTotalResults] = useState<number>(0);
   const [resultsPerPage] = useState<number>(20);
+  const [hasError, setHasError] = useState<boolean>(false);
+
+  const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
 
   const fetchPokemonDetails = useCallback(
     async (url: string): Promise<PokemonDetails> => {
@@ -190,8 +196,20 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
 
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
+  const triggerError = () => {
+    setHasError(true);
+  };
+
   return (
-    <div className="results">
+    <div className="app-container">
+      <div className="top-controls">
+        <Search onSearch={handleSearch} />
+      </div>
+
       {loading && (
         <div className="loader">
           <div className="spinner"></div>
@@ -219,6 +237,10 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
           </button>
         )}
       </div>
+      <button className="error-button" onClick={triggerError}>
+        Throw Error
+      </button>
+      {hasError && <ErrorTest />}
     </div>
   );
 };
