@@ -157,8 +157,23 @@
   margin-top: 20px;
 }
 
+.page-input {
+  width: 50px;
+  height: 30px;
+  margin: 10px;
+  border-radius: 4px;
+  font-size: 18px;
+}
+
+.page-info {
+  color: white;
+  font-size: 20px;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
 .pagination-button {
-  padding: 12px 20px;
+  padding: 10px 20px;
   font-size: 16px;
   background-color: #154a6e;
   color: white;
@@ -234,4 +249,9 @@
 .not-found-container p {
   font-size: 30px;
   color: #f80c0c;
+}
+
+.no-results-message {
+  font-size: 30px;
+  color: #fffafa;
 }

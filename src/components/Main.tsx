@@ -201,6 +201,7 @@ const Main: React.FC<MainProps> = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1);
     navigate(`?page=1`);
   };
 
@@ -224,18 +225,20 @@ const Main: React.FC<MainProps> = () => {
         <CardList results={results} />
       )}
       {!loading && !error && results.length === 0 && (
-        <div>No results found</div>
+        <div className="no-results-message">No results found</div>
       )}
-      <div className="pagination-controls">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => {
-            setCurrentPage(page);
-            navigate(`?page=${page}`);
-          }}
-        />
-      </div>
+      {!loading && totalPages > 1 && (
+        <div className="pagination-controls">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              navigate(`?page=${page}`);
+            }}
+          />
+        </div>
+      )}
       <button className="error-button" onClick={triggerError}>
         Throw Error
       </button>
