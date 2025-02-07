@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import CardList from './CardList';
 import Search from './Search';
 import axios from 'axios';
 import ErrorTest from './ErrorTest';
 import useStorageSearch from '../hooks/useSrorageSearch';
+import Pagination from './Pagination';
 
 interface Pokemon {
   name: string;
@@ -59,6 +60,16 @@ const Main: React.FC<MainProps> = () => {
   const [hasError, setHasError] = useState<boolean>(false);
 
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const page = queryParams.get('page');
+    if (page) {
+      setCurrentPage(Number(page));
+    }
+  }, [location]);
 
   const fetchPokemonDetails = useCallback(
     async (url: string): Promise<PokemonDetails> => {
@@ -186,18 +197,11 @@ const Main: React.FC<MainProps> = () => {
     }
   }, [searchTerm, currentPage, id, fetchData, fetchPokemonById]);
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
+    navigate(`?page=1`);
   };
 
   const triggerError = () => {
@@ -223,19 +227,14 @@ const Main: React.FC<MainProps> = () => {
         <div>No results found</div>
       )}
       <div className="pagination-controls">
-        {currentPage > 1 && (
-          <button onClick={handlePreviousPage} className="pagination-button">
-            Previous
-          </button>
-        )}
-        <span className="page-info">
-          Page {currentPage} of {totalPages}
-        </span>
-        {currentPage < totalPages && (
-          <button onClick={handleNextPage} className="pagination-button">
-            Next
-          </button>
-        )}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            navigate(`?page=${page}`);
+          }}
+        />
       </div>
       <button className="error-button" onClick={triggerError}>
         Throw Error
