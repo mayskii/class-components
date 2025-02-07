@@ -5,6 +5,7 @@ import Main from './components/Main';
 import ErrorBoundary from './components/ErrorBoundary';
 import ErrorTest from './components/ErrorTest';
 import useStorageSearch from './hooks/useSrorageSearch';
+import NotFoundPage from './components/NotFoundPage';
 import './App.css';
 
 const App: React.FC = () => {
@@ -43,6 +44,8 @@ const App: React.FC = () => {
               path="/class-components/details/:id"
               element={<Main searchTerm={searchTerm} />}
             />
+
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
 
           <button className="error-button" onClick={triggerError}>

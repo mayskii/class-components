@@ -211,3 +211,24 @@
 .error-boundary button:hover {
   background-color: #75a4c4;
 }
+
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #ffffff;
+  color: rgb(251, 3, 3);
+  text-align: center;
+}
+
+.not-found-container h1 {
+  font-size: 100px;
+  color: #f44336;
+}
+
+.not-found-container p {
+  font-size: 30px;
+  color: #f80c0c;
+}

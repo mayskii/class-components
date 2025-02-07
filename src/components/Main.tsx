@@ -67,16 +67,20 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
             ?.flavor_text || 'No description avalable';
 
         const types = response.data.types
-          .map((type: Type) => type.type.name)
-          .join(', ');
+          ? response.data.types.map((type: Type) => type.type.name).join(', ')
+          : 'Types not available';
 
         const abilities = response.data.abilities
-          .map((ability: Ability) => ability.ability.name)
-          .join(', ');
+          ? response.data.abilities
+              .map((ability: Ability) => ability.ability.name)
+              .join(', ')
+          : 'Abilities not available';
 
         const stats = response.data.stats
-          .map((stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`)
-          .join(', ');
+          ? response.data.stats
+              .map((stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`)
+              .join(', ')
+          : 'Stats not available';
 
         return {
           description,
@@ -140,7 +144,7 @@ const Main: React.FC<MainProps> = ({ searchTerm }) => {
           }
         });
     },
-    [resultsPerPage]
+    [resultsPerPage, fetchPokemonDetails]
   );
 
   const fetchPokemonById = useCallback(
