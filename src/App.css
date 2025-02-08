@@ -255,3 +255,53 @@
   font-size: 30px;
   color: #fffafa;
 }
+
+.card {
+  display: grid;
+  grid-template-rows: 1fr 5fr;
+  background-color: black;
+  border-radius: 8px;
+}
+.card-header {
+  position: relative;
+  width: 100%;
+}
+
+.close-button {
+  position: absolute;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin: 12px 0;
+  background-color: #154a6e;
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #75a4c4;
+}
+
+.card-body {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  margin: 20px;
+}
+
+.left-section {
+  color: white;
+  border: 1px solid #ddd;
+  padding: 20px;
+  width: 100%;
+}
+
+.right-section {
+  color: white;
+  border: 1px solid #ddd;
+  padding: 20px;
+  width: 100%;
+}

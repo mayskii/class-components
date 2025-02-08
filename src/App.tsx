@@ -21,10 +21,6 @@ const App: React.FC = () => {
             path="/class-components/details/:id"
             element={<Main searchTerm="" />}
           />
-          <Route
-            path="/class-components/details/:id"
-            element={<Main searchTerm="" />}
-          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

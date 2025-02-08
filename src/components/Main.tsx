@@ -171,20 +171,10 @@ const Main: React.FC<MainProps> = () => {
       setLoading(true);
       setError(null);
       try {
-        if (!id) {
-          console.error('Invalid Pokemon ID:', id);
-          throw new Error('Pokemon ID is invalid');
-        }
-
         const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
-        console.log('Fetching data from URL:', url);
 
         const response = await axios.get(url);
-
-        console.log('Response data:', response.data);
-
         const details = await fetchPokemonDetails(url);
-        console.log('Pokemon details:', details);
 
         setLoading(false);
         setResults([
@@ -196,11 +186,10 @@ const Main: React.FC<MainProps> = () => {
         ]);
       } catch {
         setLoading(false);
-        console.error('Error fetching Pokémon by ID:', error);
         setError('Pokemon not found');
       }
     },
-    [fetchPokemonDetails, error]
+    [fetchPokemonDetails]
   );
 
   useEffect(() => {
@@ -216,11 +205,11 @@ const Main: React.FC<MainProps> = () => {
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
-    navigate(`?page=1`);
+    navigate(`?search=${term}&page=1`);
   };
   const handlePokemonClick = (pokemon: Pokemon) => {
     setSelectedPokemon(pokemon);
-    navigate(`/class-components/details/${pokemon.name}`);
+    navigate(`/class-components/?id=${pokemon.name}&details=1`);
   };
 
   const closeDetails = () => {
@@ -234,9 +223,11 @@ const Main: React.FC<MainProps> = () => {
 
   return (
     <div className="app-container">
-      <div className="top-controls">
-        <Search onSearch={handleSearch} />
-      </div>
+      {!selectedPokemon && (
+        <div className="top-controls">
+          <Search onSearch={handleSearch} />
+        </div>
+      )}
 
       {loading && (
         <div className="loader">
@@ -244,22 +235,27 @@ const Main: React.FC<MainProps> = () => {
         </div>
       )}
       {error && <div className="error-message">{error}</div>}
-      {!loading && !error && results.length > 0 && (
+
+      {!loading && !error && results.length > 0 && !selectedPokemon && (
         <div className="main-content">
-          <div className="left-section">
+          <div className="main-section">
             <CardList results={results} onPokemonClick={handlePokemonClick} />
           </div>
-          {!loading && !error && selectedPokemon && (
-            <div className="right-section">
-              <Card pokemon={selectedPokemon} onClose={closeDetails} />
-            </div>
-          )}
         </div>
       )}
-      {!loading && !error && results.length === 0 && (
+
+      {!loading && !error && selectedPokemon && (
+        <div className="main-content">
+          <div className="main-section">
+            <Card pokemon={selectedPokemon} onClose={closeDetails} />
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && results.length === 0 && !selectedPokemon && (
         <div className="no-results-message">No results found</div>
       )}
-      {!loading && totalPages > 1 && (
+      {!loading && totalPages > 1 && !selectedPokemon && (
         <div className="pagination-controls">
           <Pagination
             currentPage={currentPage}
@@ -271,9 +267,11 @@ const Main: React.FC<MainProps> = () => {
           />
         </div>
       )}
-      <button className="error-button" onClick={triggerError}>
-        Throw Error
-      </button>
+      {!selectedPokemon && (
+        <button className="error-button" onClick={triggerError}>
+          Throw Error
+        </button>
+      )}
       {hasError && <ErrorTest />}
     </div>
   );
