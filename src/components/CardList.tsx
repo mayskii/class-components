@@ -2,18 +2,20 @@ import React from 'react';
 
 interface PokemonDetails {
   description: string;
-  types: string;
-  abilities: string;
-  stats: string;
+  types: string[];
+  abilities: string[];
+  stats: string[];
 }
 interface Pokemon {
   name: string;
+  url: string;
   description?: PokemonDetails;
 }
 interface CardListProps {
   results: Pokemon[];
+  onPokemonClick: (pokemon: Pokemon) => void;
 }
-const CardList: React.FC<CardListProps> = ({ results }) => {
+const CardList: React.FC<CardListProps> = ({ results, onPokemonClick }) => {
   return (
     <div className="card-list-container">
       <table className="card-table">
@@ -30,7 +32,7 @@ const CardList: React.FC<CardListProps> = ({ results }) => {
             </tr>
           ) : (
             results.map((pokemon, index) => (
-              <tr key={index}>
+              <tr key={index} onClick={() => onPokemonClick(pokemon)}>
                 <td>{pokemon.name}</td>
                 <td>
                   {pokemon.description ? (

@@ -6,12 +6,7 @@ import axios from 'axios';
 import ErrorTest from './ErrorTest';
 import useStorageSearch from '../hooks/useSrorageSearch';
 import Pagination from './Pagination';
-
-interface Pokemon {
-  name: string;
-  url: string;
-  description?: PokemonDetails;
-}
+import Card from './Card';
 
 interface MainProps {
   searchTerm: string;
@@ -44,9 +39,15 @@ interface Stat {
 
 interface PokemonDetails {
   description: string;
-  types: string;
-  abilities: string;
-  stats: string;
+  types: string[];
+  abilities: string[];
+  stats: string[];
+}
+
+interface Pokemon {
+  name: string;
+  url: string;
+  description?: PokemonDetails;
 }
 
 const Main: React.FC<MainProps> = () => {
@@ -60,6 +61,7 @@ const Main: React.FC<MainProps> = () => {
   const [hasError, setHasError] = useState<boolean>(false);
 
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
+  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,20 +86,20 @@ const Main: React.FC<MainProps> = () => {
             ?.flavor_text || 'No description avalable';
 
         const types = response.data.types
-          ? response.data.types.map((type: Type) => type.type.name).join(', ')
-          : 'Types not available';
+          ? response.data.types.map((type: Type) => type.type.name)
+          : ['Types not available'];
 
         const abilities = response.data.abilities
-          ? response.data.abilities
-              .map((ability: Ability) => ability.ability.name)
-              .join(', ')
-          : 'Abilities not available';
+          ? response.data.abilities.map(
+              (ability: Ability) => ability.ability.name
+            )
+          : ['Abilities not available'];
 
         const stats = response.data.stats
-          ? response.data.stats
-              .map((stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`)
-              .join(', ')
-          : 'Stats not available';
+          ? response.data.stats.map(
+              (stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`
+            )
+          : ['Stats not available'];
 
         return {
           description,
@@ -109,9 +111,9 @@ const Main: React.FC<MainProps> = () => {
         console.error('Error fetching details:', error);
         return {
           description: 'Description not available',
-          types: 'Types not available',
-          abilities: 'Abilities not available',
-          stats: 'Stats not available',
+          types: ['Types not available'],
+          abilities: ['Abilities not available'],
+          stats: ['Stats not available'],
         };
       }
     },
@@ -169,10 +171,21 @@ const Main: React.FC<MainProps> = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(
-          `https://pokeapi.co/api/v2/pokemon/${id}`
-        );
-        const details = await fetchPokemonDetails(response.data.url);
+        if (!id) {
+          console.error('Invalid Pokemon ID:', id);
+          throw new Error('Pokemon ID is invalid');
+        }
+
+        const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
+        console.log('Fetching data from URL:', url);
+
+        const response = await axios.get(url);
+
+        console.log('Response data:', response.data);
+
+        const details = await fetchPokemonDetails(url);
+        console.log('Pokemon details:', details);
+
         setLoading(false);
         setResults([
           {
@@ -183,10 +196,11 @@ const Main: React.FC<MainProps> = () => {
         ]);
       } catch {
         setLoading(false);
+        console.error('Error fetching Pokémon by ID:', error);
         setError('Pokemon not found');
       }
     },
-    [fetchPokemonDetails]
+    [fetchPokemonDetails, error]
   );
 
   useEffect(() => {
@@ -203,6 +217,15 @@ const Main: React.FC<MainProps> = () => {
     setSearchTerm(term);
     setCurrentPage(1);
     navigate(`?page=1`);
+  };
+  const handlePokemonClick = (pokemon: Pokemon) => {
+    setSelectedPokemon(pokemon);
+    navigate(`/class-components/details/${pokemon.name}`);
+  };
+
+  const closeDetails = () => {
+    setSelectedPokemon(null);
+    navigate(`/class-components/`);
   };
 
   const triggerError = () => {
@@ -222,7 +245,16 @@ const Main: React.FC<MainProps> = () => {
       )}
       {error && <div className="error-message">{error}</div>}
       {!loading && !error && results.length > 0 && (
-        <CardList results={results} />
+        <div className="main-content">
+          <div className="left-section">
+            <CardList results={results} onPokemonClick={handlePokemonClick} />
+          </div>
+          {!loading && !error && selectedPokemon && (
+            <div className="right-section">
+              <Card pokemon={selectedPokemon} onClose={closeDetails} />
+            </div>
+          )}
+        </div>
       )}
       {!loading && !error && results.length === 0 && (
         <div className="no-results-message">No results found</div>
