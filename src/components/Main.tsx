@@ -9,7 +9,7 @@ import Pagination from './Pagination';
 import { Outlet } from 'react-router-dom';
 
 interface MainProps {
-  searchTerm: string;
+  searchTerm?: string;
 }
 
 interface FlavorTextEntry {
