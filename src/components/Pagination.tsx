@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface PaginationProps {
@@ -15,9 +15,17 @@ const Pagination: React.FC<PaginationProps> = ({
   const navigate = useNavigate();
   const [inputPage, setInputPage] = useState(currentPage);
 
+  useEffect(() => {
+    setInputPage(currentPage);
+  }, [currentPage]);
+
   const handlePageChange = (page: number) => {
-    navigate(`?page=${page}`);
-    if (onPageChange) onPageChange(page);
+    if (page >= 1 && page <= totalPages) {
+      if (onPageChange) {
+        onPageChange(page);
+      }
+      navigate(`?page=${page}`);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +48,7 @@ const Pagination: React.FC<PaginationProps> = ({
           onClick={() => handlePageChange(currentPage - 1)}
           className="pagination-button"
         >
-          Previos
+          Previous
         </button>
       )}
 

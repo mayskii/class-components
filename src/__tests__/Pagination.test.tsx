@@ -22,14 +22,14 @@ describe('Pagination', () => {
         <Pagination currentPage={1} totalPages={5} />
       </MemoryRouter>
     );
-    expect(queryByText('Previos')).toBeNull();
+    expect(queryByText('Previous')).toBeNull();
 
     const { queryByText: queryByText2 } = render(
       <MemoryRouter>
         <Pagination currentPage={2} totalPages={5} />
       </MemoryRouter>
     );
-    expect(queryByText2('Previos')).toBeTruthy();
+    expect(queryByText2('Previous')).toBeTruthy();
   });
 
   test('should not change page if input value is greater than totalPages', () => {
