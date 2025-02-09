@@ -61,33 +61,35 @@
     ]
   },
   "jest": {
-  "preset": "ts-jest",
-  "testEnvironment": "jest-environment-jsdom",
-  "transform": {
-    "^.+\\.(ts|tsx)$": "ts-jest"
-  },
-  "setupFiles": ["<rootDir>/jest.setup.js"],
-  "setupFilesAfterEnv": [
-    "<rootDir>/src/__tests__/setup.ts"
-  ],
-  "collectCoverage": true,
-  "coverageDirectory": "./coverage",
-  "coverageReporters": [
-    "text",
-    "lcov"
-  ],
-  "coverage": {
-    "include": [
-      "**/*.tsx"
+    "preset": "ts-jest",
+    "testEnvironment": "jest-environment-jsdom",
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
     ],
-    "exclude": [
-      "**/node_modules/**",
-      "**/*.test.tsx",
-      "**/*.spec.tsx",
-      "src/__tests__/setup.ts"
-    ]
-  }
-}, 
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/__tests__/setup.ts"
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "coverage": {
+      "include": [
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "**/node_modules/**",
+        "**/*.test.tsx",
+        "**/*.spec.tsx",
+        "src/__tests__/setup.ts"
+      ]
+    }
+  },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
   "main": "eslint.config.js",
   "author": "",
