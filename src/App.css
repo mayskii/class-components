@@ -269,6 +269,7 @@
 
 .right-section {
   flex: 3;
+  min-width: 300px;
   justify-content: space-between;
   align-items: center;
   background-color: #fff;
@@ -311,7 +312,8 @@
 }
 
 .left-section {
-  flex: 2;
+  flex: 2️;
+  min-width: 200px;
   background-color: #000000;
   padding: 20px;
   border-radius: 10px;
