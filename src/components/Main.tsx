@@ -58,6 +58,7 @@ const Main: React.FC<MainProps> = () => {
   const [totalResults, setTotalResults] = useState<number>(0);
   const [resultsPerPage] = useState<number>(20);
   const [hasError, setHasError] = useState<boolean>(false);
+  const [detailsLoading, setDetailsLoading] = useState<boolean>(false);
 
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
@@ -159,7 +160,7 @@ const Main: React.FC<MainProps> = () => {
 
   const fetchPokemonById = useCallback(
     async (id: string) => {
-      setLoading(true);
+      setDetailsLoading(true);
       setError(null);
       try {
         const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
@@ -168,6 +169,7 @@ const Main: React.FC<MainProps> = () => {
         const details = await fetchPokemonDetails(url);
 
         setLoading(false);
+        setDetailsLoading(false);
         setSelectedPokemon({
           name: response.data.name,
           url: response.data.url,
@@ -175,6 +177,7 @@ const Main: React.FC<MainProps> = () => {
         });
       } catch {
         setLoading(false);
+        setDetailsLoading(false);
         setError('Pokemon not found');
       }
     },
@@ -187,6 +190,7 @@ const Main: React.FC<MainProps> = () => {
     const page = queryParams.get('page') || '1';
     const pokemonId = queryParams.get('id');
 
+    setSearchTerm(search);
     setCurrentPage(Number(page));
 
     if (pokemonId) {
@@ -194,7 +198,7 @@ const Main: React.FC<MainProps> = () => {
     } else if (search) {
       fetchData(search, Number(page));
     }
-  }, [location.search, fetchData, searchTerm, fetchPokemonById]);
+  }, [location.search, fetchData, searchTerm, fetchPokemonById, setSearchTerm]);
 
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
@@ -213,10 +217,10 @@ const Main: React.FC<MainProps> = () => {
     navigate(navigateTo);
   };
 
-  // const closeDetails = () => {
-  //   setSelectedPokemon(null);
-  //   navigate(`?search=${searchTerm}&page=${currentPage}`);
-  // };
+  const closePokemonDetails = () => {
+    setSelectedPokemon(null);
+    navigate('?search=' + searchTerm + '&page=1');
+  };
 
   const triggerError = () => {
     setHasError(true);
@@ -272,12 +276,15 @@ const Main: React.FC<MainProps> = () => {
           {hasError && <ErrorTest />}
         </>
       )}
-      {selectedPokemon ? (
-        <>
-          <Outlet context={{ pokemon: selectedPokemon }} />
-        </>
-      ) : (
-        <div>Loading...</div>
+      {selectedPokemon && (
+        <div className="pokemon-details-container">
+          <div className="close-button" onClick={closePokemonDetails}>
+            Close
+          </div>
+          <Outlet
+            context={{ pokemon: selectedPokemon, results, detailsLoading }}
+          />
+        </div>
       )}
     </div>
   );
