@@ -7,6 +7,8 @@
 
 .app-container {
   display: flex;
+  height: 100%;
+  width: 100%;
   flex-direction: column;
   align-items: center;
   padding: 20px;
@@ -258,6 +260,8 @@
 
 .card {
   display: grid;
+  width: 400px;
+  height: 500px;
   grid-template-rows: 1fr 5fr;
   background-color: black;
   border-radius: 8px;

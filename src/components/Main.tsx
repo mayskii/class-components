@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import CardList from './CardList';
 import Search from './Search';
 import axios from 'axios';
 import ErrorTest from './ErrorTest';
 import useStorageSearch from '../hooks/useSrorageSearch';
 import Pagination from './Pagination';
-import Card from './Card';
+import { Outlet } from 'react-router-dom';
 
 interface MainProps {
   searchTerm: string;
@@ -51,7 +51,6 @@ interface Pokemon {
 }
 
 const Main: React.FC<MainProps> = () => {
-  const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Pokemon[]>([]);
@@ -64,14 +63,6 @@ const Main: React.FC<MainProps> = () => {
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const page = queryParams.get('page');
-    if (page) {
-      setCurrentPage(Number(page));
-    }
-  }, [location]);
 
   const fetchPokemonDetails = useCallback(
     async (url: string): Promise<PokemonDetails> => {
@@ -177,13 +168,11 @@ const Main: React.FC<MainProps> = () => {
         const details = await fetchPokemonDetails(url);
 
         setLoading(false);
-        setResults([
-          {
-            name: response.data.name,
-            url: response.data.url,
-            description: details,
-          },
-        ]);
+        setSelectedPokemon({
+          name: response.data.name,
+          url: response.data.url,
+          description: details,
+        });
       } catch {
         setLoading(false);
         setError('Pokemon not found');
@@ -193,12 +182,19 @@ const Main: React.FC<MainProps> = () => {
   );
 
   useEffect(() => {
-    if (id) {
-      fetchPokemonById(id);
-    } else if (searchTerm) {
-      fetchData(searchTerm, currentPage);
+    const queryParams = new URLSearchParams(location.search);
+    const search = queryParams.get('search') || searchTerm;
+    const page = queryParams.get('page') || '1';
+    const pokemonId = queryParams.get('id');
+
+    setCurrentPage(Number(page));
+
+    if (pokemonId) {
+      fetchPokemonById(pokemonId);
+    } else if (search) {
+      fetchData(search, Number(page));
     }
-  }, [searchTerm, currentPage, id, fetchData, fetchPokemonById]);
+  }, [location.search, fetchData, searchTerm, fetchPokemonById]);
 
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
@@ -207,15 +203,20 @@ const Main: React.FC<MainProps> = () => {
     setCurrentPage(1);
     navigate(`?search=${term}&page=1`);
   };
-  const handlePokemonClick = (pokemon: Pokemon) => {
-    setSelectedPokemon(pokemon);
-    navigate(`/class-components/?id=${pokemon.name}&details=1`);
+  const handlePokemonClick = async (pokemon: Pokemon) => {
+    const details = await fetchPokemonDetails(pokemon.url);
+
+    setSelectedPokemon({ ...pokemon, description: details });
+
+    const navigateTo = `${pokemon.name}?search=${searchTerm}&page=${currentPage}&id=${pokemon.name}&details=1`;
+
+    navigate(navigateTo);
   };
 
-  const closeDetails = () => {
-    setSelectedPokemon(null);
-    navigate(`/class-components/`);
-  };
+  // const closeDetails = () => {
+  //   setSelectedPokemon(null);
+  //   navigate(`?search=${searchTerm}&page=${currentPage}`);
+  // };
 
   const triggerError = () => {
     setHasError(true);
@@ -224,55 +225,60 @@ const Main: React.FC<MainProps> = () => {
   return (
     <div className="app-container">
       {!selectedPokemon && (
-        <div className="top-controls">
-          <Search onSearch={handleSearch} />
-        </div>
-      )}
-
-      {loading && (
-        <div className="loader">
-          <div className="spinner"></div>
-        </div>
-      )}
-      {error && <div className="error-message">{error}</div>}
-
-      {!loading && !error && results.length > 0 && !selectedPokemon && (
-        <div className="main-content">
-          <div className="main-section">
-            <CardList results={results} onPokemonClick={handlePokemonClick} />
+        <>
+          <div className="top-controls">
+            <Search onSearch={handleSearch} />
           </div>
-        </div>
-      )}
 
-      {!loading && !error && selectedPokemon && (
-        <div className="main-content">
-          <div className="main-section">
-            <Card pokemon={selectedPokemon} onClose={closeDetails} />
-          </div>
-        </div>
-      )}
+          {loading && (
+            <div className="loader">
+              <div className="spinner"></div>
+            </div>
+          )}
 
-      {!loading && !error && results.length === 0 && !selectedPokemon && (
-        <div className="no-results-message">No results found</div>
+          {error && <div className="error-message">{error}</div>}
+
+          {!loading && !error && results.length > 0 && (
+            <div className="main-content">
+              <div className="main-section">
+                <CardList
+                  results={results}
+                  onPokemonClick={handlePokemonClick}
+                />
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && results.length === 0 && (
+            <div className="no-results-message">No results found</div>
+          )}
+
+          {!loading && totalPages > 1 && (
+            <div className="pagination-controls">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  navigate(`?page=${page}`);
+                }}
+              />
+            </div>
+          )}
+
+          <button className="error-button" onClick={triggerError}>
+            Throw Error
+          </button>
+          {hasError && <ErrorTest />}
+        </>
       )}
-      {!loading && totalPages > 1 && !selectedPokemon && (
-        <div className="pagination-controls">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => {
-              setCurrentPage(page);
-              navigate(`?page=${page}`);
-            }}
-          />
-        </div>
+      {selectedPokemon ? (
+        <>
+          <Outlet context={{ pokemon: selectedPokemon }} />
+        </>
+      ) : (
+        <div>Loading...</div>
       )}
-      {!selectedPokemon && (
-        <button className="error-button" onClick={triggerError}>
-          Throw Error
-        </button>
-      )}
-      {hasError && <ErrorTest />}
     </div>
   );
 };
