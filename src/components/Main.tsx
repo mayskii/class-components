@@ -1,40 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CardList from './CardList';
 import Search from './Search';
-import axios from 'axios';
 import ErrorTest from './ErrorTest';
 import useStorageSearch from '../hooks/useSrorageSearch';
 import Pagination from './Pagination';
 import { Outlet } from 'react-router-dom';
+import {
+  useGetPokemonListQuery,
+  useGetPokemonDetailsQuery,
+} from '../servises/pokemonApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 interface MainProps {
   searchTerm?: string;
-}
-
-interface FlavorTextEntry {
-  flavor_text: string;
-  language: {
-    name: string;
-  };
-}
-interface Type {
-  type: {
-    name: string;
-  };
-}
-
-interface Ability {
-  ability: {
-    name: string;
-  };
-}
-
-interface Stat {
-  stat: {
-    name: string;
-  };
-  base_stat: number;
 }
 
 interface PokemonDetails {
@@ -51,138 +30,24 @@ interface Pokemon {
 }
 
 const Main: React.FC<MainProps> = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<Pokemon[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalResults, setTotalResults] = useState<number>(0);
-  const [resultsPerPage] = useState<number>(20);
-  const [hasError, setHasError] = useState<boolean>(false);
-  const [detailsLoading, setDetailsLoading] = useState<boolean>(false);
-
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasError, setHasError] = useState<boolean>(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
-  const fetchPokemonDetails = useCallback(
-    async (url: string): Promise<PokemonDetails> => {
-      try {
-        const response = await axios.get(url);
+  const {
+    data: pokemonList,
+    error: pokemonListError,
+    isLoading: pokemonListLoading,
+  } = useGetPokemonListQuery({ page: currentPage });
 
-        const flavorTextEntries: FlavorTextEntry[] =
-          response.data.flavor_text_entries;
-
-        const description =
-          flavorTextEntries?.find((entry) => entry.language.name === 'en')
-            ?.flavor_text || 'No description avalable';
-
-        const types = response.data.types
-          ? response.data.types.map((type: Type) => type.type.name)
-          : ['Types not available'];
-
-        const abilities = response.data.abilities
-          ? response.data.abilities.map(
-              (ability: Ability) => ability.ability.name
-            )
-          : ['Abilities not available'];
-
-        const stats = response.data.stats
-          ? response.data.stats.map(
-              (stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`
-            )
-          : ['Stats not available'];
-
-        return {
-          description,
-          types,
-          abilities,
-          stats,
-        };
-      } catch (error) {
-        console.error('Error fetching details:', error);
-        return {
-          description: 'Description not available',
-          types: ['Types not available'],
-          abilities: ['Abilities not available'],
-          stats: ['Stats not available'],
-        };
-      }
-    },
-    []
-  );
-
-  const fetchData = useCallback(
-    (searchTerm: string, page: number) => {
-      setLoading(true);
-      setError(null);
-
-      const offset = (page - 1) * resultsPerPage;
-
-      axios
-        .get(`https://pokeapi.co/api/v2/pokemon?limit=1000`)
-        .then(async (response) => {
-          const allResults = response.data.results;
-
-          const filteredResults = allResults.filter((pokemon: Pokemon) =>
-            pokemon.name
-              .toLocaleLowerCase()
-              .includes(searchTerm.toLocaleLowerCase())
-          );
-
-          const resultsWithDetails = await Promise.all(
-            filteredResults.map(async (pokemon: Pokemon) => {
-              const description = await fetchPokemonDetails(pokemon.url);
-              return { ...pokemon, description };
-            })
-          );
-          const totalFilteredResults = filteredResults.length;
-          const paginatedResults = resultsWithDetails.slice(
-            offset,
-            offset + resultsPerPage
-          );
-
-          setLoading(false);
-          setResults(paginatedResults);
-          setTotalResults(totalFilteredResults);
-        })
-        .catch((error: unknown) => {
-          setLoading(false);
-          if (error instanceof Error) {
-            setError(error.message || 'An error occurred');
-          } else {
-            setError('An unknown error occurred');
-          }
-        });
-    },
-    [resultsPerPage, fetchPokemonDetails]
-  );
-
-  const fetchPokemonById = useCallback(
-    async (id: string) => {
-      setDetailsLoading(true);
-      setError(null);
-      try {
-        const url = `https://pokeapi.co/api/v2/pokemon/${id}/`;
-
-        const response = await axios.get(url);
-        const details = await fetchPokemonDetails(url);
-
-        setLoading(false);
-        setDetailsLoading(false);
-        setSelectedPokemon({
-          name: response.data.name,
-          url: response.data.url,
-          description: details,
-        });
-      } catch {
-        setLoading(false);
-        setDetailsLoading(false);
-        setError('Pokemon not found');
-      }
-    },
-    [fetchPokemonDetails]
-  );
+  const { data: selectedPokemonData, isLoading: selectedPokemonLoading } =
+    useGetPokemonDetailsQuery(
+      selectedPokemon ? selectedPokemon.name : skipToken
+    );
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -194,26 +59,25 @@ const Main: React.FC<MainProps> = () => {
     setCurrentPage(Number(page));
 
     if (pokemonId) {
-      fetchPokemonById(pokemonId);
+      setSelectedPokemon({
+        name: pokemonId,
+        url: `https://pokeapi.co/api/v2/pokemon/${pokemonId}/`,
+      });
     } else if (search) {
-      fetchData(search, Number(page));
+      setCurrentPage(Number(page));
     }
-  }, [location.search, fetchData, searchTerm, fetchPokemonById, setSearchTerm]);
+  }, [location.search, searchTerm, setSearchTerm]);
 
-  const totalPages = Math.ceil(totalResults / resultsPerPage);
+  const totalPages = pokemonList ? Math.ceil(pokemonList.length / 20) : 0;
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
     navigate(`?search=${term}&page=1`);
   };
-  const handlePokemonClick = async (pokemon: Pokemon) => {
-    const details = await fetchPokemonDetails(pokemon.url);
-
-    setSelectedPokemon({ ...pokemon, description: details });
-
+  const handlePokemonClick = (pokemon: Pokemon) => {
+    setSelectedPokemon(pokemon);
     const navigateTo = `${pokemon.name}?search=${searchTerm}&page=${currentPage}&id=${pokemon.name}&details=1`;
-
     navigate(navigateTo);
   };
 
@@ -226,6 +90,21 @@ const Main: React.FC<MainProps> = () => {
     setHasError(true);
   };
 
+  const filteredResults = pokemonList
+    ? pokemonList.filter((pokemon) =>
+        pokemon.name.toLocaleLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  const renderErrorMessage = (error: unknown) => {
+    if (error && typeof error === 'object' && error !== null) {
+      if ('message' in error) {
+        return `Error: ${(error as { message: string }).message}`;
+      }
+    }
+    return 'An unknown error occurred while fetching the data.';
+  };
+
   return (
     <div className="app-container">
       {!selectedPokemon && (
@@ -234,30 +113,39 @@ const Main: React.FC<MainProps> = () => {
             <Search onSearch={handleSearch} />
           </div>
 
-          {loading && (
+          {pokemonListLoading && (
             <div className="loader">
               <div className="spinner"></div>
+              <span>Loading...</span>
             </div>
           )}
 
-          {error && <div className="error-message">{error}</div>}
+          {pokemonListError && (
+            <div className="error-message">
+              {renderErrorMessage(pokemonListError)}
+            </div>
+          )}
 
-          {!loading && !error && results.length > 0 && (
-            <div className="main-content">
-              <div className="main-section">
-                <CardList
-                  results={results}
-                  onPokemonClick={handlePokemonClick}
-                />
+          {!pokemonListLoading &&
+            !pokemonListError &&
+            filteredResults.length > 0 && (
+              <div className="main-content">
+                <div className="main-section">
+                  <CardList
+                    results={filteredResults}
+                    onPokemonClick={handlePokemonClick}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {!loading && !error && results.length === 0 && (
-            <div className="no-results-message">No results found</div>
-          )}
+          {!pokemonListLoading &&
+            !pokemonListError &&
+            filteredResults.length === 0 && (
+              <div className="no-results-message">No results found</div>
+            )}
 
-          {!loading && totalPages > 1 && (
+          {!pokemonListLoading && totalPages > 1 && (
             <div className="pagination-controls">
               <Pagination
                 currentPage={currentPage}
@@ -276,13 +164,17 @@ const Main: React.FC<MainProps> = () => {
           {hasError && <ErrorTest />}
         </>
       )}
-      {selectedPokemon && (
+      {selectedPokemon && selectedPokemonData && (
         <div className="pokemon-details-container">
           <div className="close-button" onClick={closePokemonDetails}>
             Close
           </div>
           <Outlet
-            context={{ pokemon: selectedPokemon, results, detailsLoading }}
+            context={{
+              pokemon: selectedPokemon,
+              details: selectedPokemonData,
+              detailsLoading: selectedPokemonLoading,
+            }}
           />
         </div>
       )}
