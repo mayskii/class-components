@@ -55,7 +55,9 @@ const Main: React.FC<MainProps> = () => {
     const page = queryParams.get('page') || '1';
     const pokemonId = queryParams.get('id');
 
-    setSearchTerm(search);
+    if (!searchTerm) {
+      setSearchTerm(search);
+    }
     setCurrentPage(Number(page));
 
     if (pokemonId) {
@@ -90,7 +92,7 @@ const Main: React.FC<MainProps> = () => {
     setHasError(true);
   };
 
-  const filteredResults = pokemonList
+  const filteredResults = Array.isArray(pokemonList)
     ? pokemonList.filter((pokemon) =>
         pokemon.name.toLocaleLowerCase().includes(searchTerm.toLowerCase())
       )
