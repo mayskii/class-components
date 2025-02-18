@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem, removeItem, resetItems } from '../selectedItemsSlice';
+import Pagination from './Pagination';
 
 interface PokemonDetails {
   description: string;
@@ -14,14 +17,39 @@ interface Pokemon {
   description?: PokemonDetails;
 }
 
+interface SelectedItemsState {
+  selectedItems: Pokemon[];
+}
+
+interface RootState {
+  selectedItems: SelectedItemsState;
+}
+
 const Card: React.FC = () => {
-  const { pokemon, detailsLoading, details, results } = useOutletContext<{
+  const {
+    pokemon,
+    detailsLoading,
+    details,
+    results,
+    currentPage,
+    totalPages,
+    onPageChange,
+  } = useOutletContext<{
     pokemon: Pokemon | null;
     details: PokemonDetails | null;
     detailsLoading: boolean;
     results: Pokemon[];
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
   }>();
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const selectedItems = useSelector(
+    (state: RootState) => state.selectedItems.selectedItems
+  );
+
   const [isRightSectionVisible, setIsRightSectionVisible] =
     useState<boolean>(true);
 
@@ -38,6 +66,39 @@ const Card: React.FC = () => {
     );
   };
 
+  const handlePageChange = (newPage: number) => {
+    onPageChange(newPage);
+    navigate(`?page=${newPage}`);
+  };
+
+  const handleSelectItem = (pokemon: Pokemon) => {
+    dispatch(addItem(pokemon));
+  };
+
+  const handleUnselectItem = (pokemon: Pokemon) => {
+    dispatch(removeItem(pokemon));
+  };
+
+  const handleUnselectAll = () => {
+    dispatch(resetItems());
+  };
+
+  const handleDownloadSelected = () => {
+    const selectedData = selectedItems.map((item: Pokemon) => ({
+      name: item.name,
+      url: item.url,
+    }));
+    const csvData = selectedData
+      .map((row: Pokemon) => Object.values(row).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvData], { type: 'taxt/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${selectedItems.length}_selected_pokemon.csv`;
+    link.click();
+  };
+
   if (!pokemon || !details) {
     return <div>Loading...</div>;
   }
@@ -46,22 +107,62 @@ const Card: React.FC = () => {
     <div className="card">
       <div className="left-section">
         <div className="pokemon-summary">
-          <h3>Item Name</h3>
-          <ul>
-            {results && results.length > 0 ? (
-              results.map((pokemon) => (
-                <li
-                  key={pokemon.name}
-                  className="card-item"
-                  onClick={() => handlePokemonClick(pokemon)}
-                >
-                  {pokemon.name}
-                </li>
-              ))
-            ) : (
-              <li>No results found</li>
-            )}
-          </ul>
+          <table className="card-table">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Select</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.length === 0 ? (
+                <tr>
+                  <td colSpan={2}>No result found</td>
+                </tr>
+              ) : (
+                results.map((pokemon) => (
+                  <tr
+                    key={pokemon.name}
+                    onClick={() => handlePokemonClick(pokemon)}
+                    className={`card-item ${selectedItems.some((item) => item.name === pokemon.name) ? 'selected' : ''}`}
+                  >
+                    <td>{pokemon.name}</td>
+
+                    <td>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          if (
+                            selectedItems.some(
+                              (item) => item.name === pokemon.name
+                            )
+                          ) {
+                            handleUnselectItem(pokemon);
+                          } else {
+                            handleSelectItem(pokemon);
+                          }
+                        }}
+                        className={
+                          selectedItems.some(
+                            (item) => item.name === pokemon.name
+                          )
+                            ? 'unselect-button'
+                            : 'select-button'
+                        }
+                      >
+                        {selectedItems.some(
+                          (item) => item.name === pokemon.name
+                        )
+                          ? 'Unselect'
+                          : 'Select'}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
       {isRightSectionVisible && (
@@ -104,6 +205,19 @@ const Card: React.FC = () => {
           )}
         </div>
       )}
+      {totalPages > 1 && (
+        <div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+      <div className="actions">
+        <button onClick={handleDownloadSelected}>Download Selected</button>
+        <button onClick={handleUnselectAll}>Unselect All</button>
+      </div>
     </div>
   );
 };

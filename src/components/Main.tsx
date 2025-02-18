@@ -59,6 +59,7 @@ const Main: React.FC<MainProps> = () => {
     isLoading: pokemonListLoading,
   } = useGetPokemonListQuery({
     page: currentPage,
+    searchTerm,
   });
 
   const { data: selectedPokemonData, isLoading: selectedPokemonLoading } =
@@ -72,7 +73,7 @@ const Main: React.FC<MainProps> = () => {
     const page = queryParams.get('page') || '1';
     const pokemonId = queryParams.get('id');
 
-    if (!searchTerm) {
+    if (search !== searchTerm) {
       setSearchTerm(search);
     }
     setCurrentPage(Number(page));
@@ -86,10 +87,6 @@ const Main: React.FC<MainProps> = () => {
       setCurrentPage(Number(page));
     }
   }, [location.search, searchTerm, setSearchTerm]);
-
-  const totalPages = pokemonListResponse
-    ? Math.ceil(pokemonListResponse.count / 20)
-    : 0;
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -120,6 +117,10 @@ const Main: React.FC<MainProps> = () => {
             .includes(searchTerm.toLowerCase());
         })
     : [];
+
+  const totalPages = pokemonListResponse
+    ? Math.ceil(filteredResults.length / 20)
+    : 0;
 
   const renderErrorMessage = (error: unknown) => {
     if (error && typeof error === 'object' && error !== null) {
@@ -158,6 +159,11 @@ const Main: React.FC<MainProps> = () => {
     link.click();
   };
 
+  const resultsToShow = filteredResults.slice(
+    (currentPage - 1) * 20,
+    currentPage * 20
+  );
+
   return (
     <div className="app-container">
       {!selectedPokemon && (
@@ -185,7 +191,7 @@ const Main: React.FC<MainProps> = () => {
               <div className="main-content">
                 <div className="main-section">
                   <CardList
-                    results={filteredResults}
+                    results={resultsToShow}
                     onPokemonClick={handlePokemonClick}
                     onSelectItem={handleSelectItem}
                     onUnselectItem={handleUnselectItem}
@@ -227,10 +233,16 @@ const Main: React.FC<MainProps> = () => {
           </div>
           <Outlet
             context={{
-              results: filteredResults,
+              results: resultsToShow,
               pokemon: selectedPokemon,
               details: selectedPokemonData,
               detailsLoading: selectedPokemonLoading,
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPageChange: (page: number) => {
+                setCurrentPage(page);
+                navigate(`?page=${page}`);
+              },
             }}
           />
         </div>

@@ -260,7 +260,9 @@
 }
 
 .card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  grid-template-rows: 5fr;
   background-color: black;
   border-radius: 8px;
   gap: 20px;
@@ -268,7 +270,6 @@
 }
 
 .right-section {
-  flex: 3;
   min-width: 300px;
   justify-content: space-between;
   align-items: center;
@@ -276,6 +277,7 @@
   color: #201f1f;
   padding: 20px;
   border-radius: 8px;
+  margin: 20px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -312,7 +314,6 @@
 }
 
 .left-section {
-  flex: 2️;
   min-width: 200px;
   background-color: #000000;
   padding: 20px;
@@ -382,4 +383,27 @@
   100% {
     transform: rotate(360deg);
   }
+}
+.select-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.select-button:hover {
+  background-color: #45a049;
+}
+
+.unselect-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.unselect-button:hover {
+  background-color: #da190b;
 }

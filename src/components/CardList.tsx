@@ -89,6 +89,11 @@ const CardList: React.FC<CardListProps> = ({
                       e.stopPropagation();
                       handleSelect(pokemon);
                     }}
+                    className={
+                      selectedItems.some((item) => item.name === pokemon.name)
+                        ? 'unselect-button'
+                        : 'select-button'
+                    }
                   >
                     {selectedItems.some((item) => item.name === pokemon.name)
                       ? 'Unselect'
