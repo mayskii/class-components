@@ -1,30 +1,39 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface Pokemon {
+  name: string;
+  url: string;
+}
+
 interface SelectedItemsState {
-  selected: string[];
+  selectedItems: Pokemon[];
 }
 
 const initialState: SelectedItemsState = {
-  selected: [],
+  selectedItems: [],
 };
 
 const selectedItemsSlice = createSlice({
   name: 'selectedItems',
   initialState,
   reducers: {
-    toggleItem: (state, action: PayloadAction<string>) => {
-      const item = action.payload;
-      if (state.selected.includes(item)) {
-        state.selected = state.selected.filter((i) => i !== item);
-      } else {
-        state.selected.push(item);
+    addItem: (state, action: PayloadAction<Pokemon>) => {
+      if (
+        !state.selectedItems.some((item) => item.name === action.payload.name)
+      ) {
+        state.selectedItems.push(action.payload);
       }
     },
-    clearItems: (state) => {
-      state.selected = [];
+    removeItem: (state, action: PayloadAction<Pokemon>) => {
+      state.selectedItems = state.selectedItems.filter(
+        (item) => item.name !== action.payload.name
+      );
+    },
+    resetItems: (state) => {
+      state.selectedItems = [];
     },
   },
 });
 
-export const { toggleItem, clearItems } = selectedItemsSlice.actions;
+export const { addItem, removeItem, resetItems } = selectedItemsSlice.actions;
 export default selectedItemsSlice.reducer;

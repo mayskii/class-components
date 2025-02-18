@@ -14,8 +14,24 @@ interface Pokemon {
 interface CardListProps {
   results: Pokemon[];
   onPokemonClick: (pokemon: Pokemon) => void;
+  onSelectItem: (pokemon: Pokemon) => void;
+  onUnselectItem: (pokemon: Pokemon) => void;
+  selectedItems: Pokemon[];
 }
-const CardList: React.FC<CardListProps> = ({ results, onPokemonClick }) => {
+const CardList: React.FC<CardListProps> = ({
+  results,
+  onPokemonClick,
+  onSelectItem,
+  onUnselectItem,
+  selectedItems = [],
+}) => {
+  const handleSelect = (pokemon: Pokemon) => {
+    if (selectedItems.some((item) => item.name === pokemon.name)) {
+      onUnselectItem(pokemon);
+    } else {
+      onSelectItem(pokemon);
+    }
+  };
   return (
     <div className="card-list-container">
       <table className="card-table">
@@ -23,6 +39,7 @@ const CardList: React.FC<CardListProps> = ({ results, onPokemonClick }) => {
           <tr>
             <th>Item Name</th>
             <th>Item Description</th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>
@@ -31,8 +48,16 @@ const CardList: React.FC<CardListProps> = ({ results, onPokemonClick }) => {
               <td colSpan={2}>No result found</td>
             </tr>
           ) : (
-            results.map((pokemon, index) => (
-              <tr key={index} onClick={() => onPokemonClick(pokemon)}>
+            results.map((pokemon) => (
+              <tr
+                key={pokemon.name}
+                onClick={() => onPokemonClick(pokemon)}
+                className={
+                  selectedItems.some((item) => item.name === pokemon.name)
+                    ? 'selected'
+                    : ''
+                }
+              >
                 <td>{pokemon.name}</td>
                 <td>
                   {pokemon.description ? (
@@ -53,8 +78,20 @@ const CardList: React.FC<CardListProps> = ({ results, onPokemonClick }) => {
                       </p>
                     </>
                   ) : (
-                    <p>No details abailable</p>
+                    <p>No details available</p>
                   )}
+                </td>
+                <td>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelect(pokemon);
+                    }}
+                  >
+                    {selectedItems.some((item) => item.name === pokemon.name)
+                      ? 'Unselect'
+                      : 'Select'}
+                  </button>
                 </td>
               </tr>
             ))

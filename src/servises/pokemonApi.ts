@@ -32,17 +32,23 @@ interface PokemonDetails {
   stats: string[];
 }
 
-interface Pokemon {
+export interface Pokemon {
   name: string;
   url: string;
-  description?: PokemonDetails;
+}
+
+interface PokemonListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Pokemon[];
 }
 
 export const pokemonApi = createApi({
   reducerPath: 'pokemonApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
   endpoints: (builder) => ({
-    getPokemonList: builder.query<Pokemon[], { page: number }>({
+    getPokemonList: builder.query<PokemonListResponse, { page: number }>({
       query: ({ page }) => {
         const offset = (page - 1) * 20;
         return `pokemon?limit=1000&offset=${offset}`;

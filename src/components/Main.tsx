@@ -11,6 +11,8 @@ import {
   useGetPokemonDetailsQuery,
 } from '../servises/pokemonApi';
 import { skipToken } from '@reduxjs/toolkit/query';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem, removeItem, resetItems } from '../selectedItemsSlice';
 
 interface MainProps {
   searchTerm?: string;
@@ -29,6 +31,14 @@ interface Pokemon {
   description?: PokemonDetails;
 }
 
+interface RootState {
+  selectedItems: SelectedItemsState;
+}
+
+interface SelectedItemsState {
+  selectedItems: Pokemon[];
+}
+
 const Main: React.FC<MainProps> = () => {
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
@@ -37,17 +47,32 @@ const Main: React.FC<MainProps> = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  const selectedItems = useSelector(
+    (state: RootState) => state.selectedItems.selectedItems
+  );
 
   const {
-    data: pokemonList,
+    data: pokemonListResponse,
     error: pokemonListError,
     isLoading: pokemonListLoading,
-  } = useGetPokemonListQuery({ page: currentPage });
+  } = useGetPokemonListQuery({
+    page: currentPage,
+  });
 
   const { data: selectedPokemonData, isLoading: selectedPokemonLoading } =
     useGetPokemonDetailsQuery(
       selectedPokemon ? selectedPokemon.name : skipToken
     );
+
+  // useEffect(() => {
+  //   console.log('Pokemon List:', pokemonListResponse);
+  // }, [pokemonListResponse]);
+
+  // useEffect(() => {
+  //   console.log('Search Term:', searchTerm);
+  // }, [searchTerm]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -70,7 +95,9 @@ const Main: React.FC<MainProps> = () => {
     }
   }, [location.search, searchTerm, setSearchTerm]);
 
-  const totalPages = pokemonList ? Math.ceil(pokemonList.length / 20) : 0;
+  const totalPages = pokemonListResponse
+    ? Math.ceil(pokemonListResponse.count / 20)
+    : 0;
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -92,10 +119,15 @@ const Main: React.FC<MainProps> = () => {
     setHasError(true);
   };
 
-  const filteredResults = Array.isArray(pokemonList)
-    ? pokemonList.filter((pokemon) =>
-        pokemon.name.toLocaleLowerCase().includes(searchTerm.toLowerCase())
-      )
+  const filteredResults = Array.isArray(pokemonListResponse?.results)
+    ? searchTerm.trim() === ''
+      ? pokemonListResponse.results
+      : pokemonListResponse.results.filter((pokemon: Pokemon) => {
+          console.log(`Searching for: ${searchTerm}, Pokemon: ${pokemon.name}`);
+          return pokemon.name
+            .toLocaleLowerCase()
+            .includes(searchTerm.toLowerCase());
+        })
     : [];
 
   const renderErrorMessage = (error: unknown) => {
@@ -105,6 +137,34 @@ const Main: React.FC<MainProps> = () => {
       }
     }
     return 'An unknown error occurred while fetching the data.';
+  };
+
+  const handleSelectItem = (pokemon: Pokemon) => {
+    dispatch(addItem(pokemon));
+  };
+
+  const handleUnselectItem = (pokemon: Pokemon) => {
+    dispatch(removeItem(pokemon));
+  };
+
+  const handleUnselectAll = () => {
+    dispatch(resetItems());
+  };
+
+  const handleDownloadSelected = () => {
+    const selectedData = selectedItems.map((item: Pokemon) => ({
+      name: item.name,
+      url: item.url,
+    }));
+    const csvData = selectedData
+      .map((row: Pokemon) => Object.values(row).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvData], { type: 'taxt/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${selectedItems.length}_selected_pokemon.csv`;
+    link.click();
   };
 
   return (
@@ -136,6 +196,9 @@ const Main: React.FC<MainProps> = () => {
                   <CardList
                     results={filteredResults}
                     onPokemonClick={handlePokemonClick}
+                    onSelectItem={handleSelectItem}
+                    onUnselectItem={handleUnselectItem}
+                    selectedItems={selectedItems}
                   />
                 </div>
               </div>
@@ -178,6 +241,13 @@ const Main: React.FC<MainProps> = () => {
               detailsLoading: selectedPokemonLoading,
             }}
           />
+        </div>
+      )}
+      {selectedItems.length > 0 && (
+        <div className="flyout">
+          <div>{selectedItems.length} item(s) selected</div>
+          <button onClick={handleUnselectAll}>Unselect all</button>
+          <button onClick={handleDownloadSelected}>Download</button>
         </div>
       )}
     </div>
