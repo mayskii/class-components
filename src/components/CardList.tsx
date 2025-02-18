@@ -25,6 +25,8 @@ const CardList: React.FC<CardListProps> = ({
   onUnselectItem,
   selectedItems = [],
 }) => {
+  console.log('results:', results);
+
   const handleSelect = (pokemon: Pokemon) => {
     if (selectedItems.some((item) => item.name === pokemon.name)) {
       onUnselectItem(pokemon);

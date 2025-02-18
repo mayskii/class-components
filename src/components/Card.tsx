@@ -13,25 +13,21 @@ interface Pokemon {
   url: string;
   description?: PokemonDetails;
 }
+
 const Card: React.FC = () => {
-  const { pokemon, results } = useOutletContext<{
+  const { pokemon, detailsLoading, details, results } = useOutletContext<{
     pokemon: Pokemon | null;
-    results: Pokemon[];
+    details: PokemonDetails | null;
     detailsLoading: boolean;
+    results: Pokemon[];
   }>();
   const navigate = useNavigate();
-
   const [isRightSectionVisible, setIsRightSectionVisible] =
     useState<boolean>(true);
-  const [detailsLoading, setDetailsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (pokemon && pokemon.url) {
-      setDetailsLoading(true);
       setIsRightSectionVisible(true);
-      setTimeout(() => {
-        setDetailsLoading(false);
-      }, 1500);
     }
   }, [pokemon]);
 
@@ -42,7 +38,7 @@ const Card: React.FC = () => {
     );
   };
 
-  if (!pokemon) {
+  if (!pokemon || !details) {
     return <div>Loading...</div>;
   }
 
@@ -53,12 +49,13 @@ const Card: React.FC = () => {
           <h3>Item Name</h3>
           <ul>
             {results && results.length > 0 ? (
-              results.map((pokemonItem) => (
+              results.map((pokemon) => (
                 <li
-                  key={pokemonItem.name}
-                  onClick={() => handlePokemonClick(pokemonItem)}
+                  key={pokemon.name}
+                  className="card-item"
+                  onClick={() => handlePokemonClick(pokemon)}
                 >
-                  {pokemonItem.name}
+                  {pokemon.name}
                 </li>
               ))
             ) : (
@@ -82,7 +79,7 @@ const Card: React.FC = () => {
               <div className="pokemon-types">
                 <h3>Types</h3>
                 <ul>
-                  {pokemon.description?.types.map((type, index) => (
+                  {details?.types.map((type, index) => (
                     <li key={index}>{type}</li>
                   ))}
                 </ul>
@@ -90,7 +87,7 @@ const Card: React.FC = () => {
               <div className="pokemon-abilities">
                 <h3>Abilities</h3>
                 <ul>
-                  {pokemon.description?.abilities.map((ability, index) => (
+                  {details?.abilities.map((ability, index) => (
                     <li key={index}>{ability}</li>
                   ))}
                 </ul>
@@ -98,7 +95,7 @@ const Card: React.FC = () => {
               <div className="pokemon-stats">
                 <h3>Stats</h3>
                 <ul>
-                  {pokemon.description?.stats.map((stat, index) => (
+                  {details?.stats.map((stat, index) => (
                     <li key={index}>{stat}</li>
                   ))}
                 </ul>

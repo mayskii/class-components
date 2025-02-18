@@ -63,16 +63,8 @@ const Main: React.FC<MainProps> = () => {
 
   const { data: selectedPokemonData, isLoading: selectedPokemonLoading } =
     useGetPokemonDetailsQuery(
-      selectedPokemon ? selectedPokemon.name : skipToken
+      selectedPokemon ? selectedPokemon.url : skipToken
     );
-
-  // useEffect(() => {
-  //   console.log('Pokemon List:', pokemonListResponse);
-  // }, [pokemonListResponse]);
-
-  // useEffect(() => {
-  //   console.log('Search Term:', searchTerm);
-  // }, [searchTerm]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -123,7 +115,6 @@ const Main: React.FC<MainProps> = () => {
     ? searchTerm.trim() === ''
       ? pokemonListResponse.results
       : pokemonListResponse.results.filter((pokemon: Pokemon) => {
-          console.log(`Searching for: ${searchTerm}, Pokemon: ${pokemon.name}`);
           return pokemon.name
             .toLocaleLowerCase()
             .includes(searchTerm.toLowerCase());
@@ -236,6 +227,7 @@ const Main: React.FC<MainProps> = () => {
           </div>
           <Outlet
             context={{
+              results: filteredResults,
               pokemon: selectedPokemon,
               details: selectedPokemonData,
               detailsLoading: selectedPokemonLoading,

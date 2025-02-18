@@ -1,99 +1,69 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Card from '../components/Card';
-import { BrowserRouter as Router, useOutletContext } from 'react-router-dom';
+import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import '@testing-library/jest-dom';
-import React from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
   useOutletContext: jest.fn(),
 }));
 
-const mockPokemon = {
-  name: 'Pikachu',
-  description: {
-    types: ['Electric'],
-    abilities: ['Static'],
-    stats: ['Speed: 90'],
-  },
-};
-
-const mockResults = [
-  {
-    name: 'Charmander',
-    url: 'https://pokeapi.co/api/v2/pokemon/4/',
-  },
-  {
-    name: 'Bulbasaur',
-    url: 'https://pokeapi.co/api/v2/pokemon/1/',
-  },
-];
-
 describe('Card component', () => {
-  test('renders loading state when pokemon is not loaded', () => {
-    (useOutletContext as jest.Mock).mockReturnValue({
-      pokemon: null,
-      results: mockResults,
-      detailsLoading: true,
-    });
-    render(
-      <Router>
-        <Card />
-      </Router>
-    );
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
+  let mockNavigate: jest.Mock;
 
-  test('renders pokemon name after loading', () => {
+  beforeEach(() => {
+    mockNavigate = jest.fn();
+
     (useOutletContext as jest.Mock).mockReturnValue({
-      pokemon: mockPokemon,
-      results: mockResults,
+      pokemon: { name: 'pikachu', url: 'url' },
+      details: {
+        description: 'Electric type',
+        types: ['electric'],
+        abilities: ['static'],
+        stats: ['speed: 90', 'attack: 55'],
+      },
       detailsLoading: false,
+      results: [
+        { name: 'bulbasaur', url: 'url1' },
+        { name: 'charmander', url: 'url2' },
+      ],
     });
 
-    render(
-      <Router>
-        <Card />
-      </Router>
-    );
-
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
   });
 
-  test('shows loading indicator when pokemon is loading', () => {
-    (useOutletContext as jest.Mock).mockReturnValue({
-      pokemon: null,
-      results: [],
-      detailsLoading: true,
-    });
-
+  test('should display pokemon details when data is available', async () => {
     render(
       <Router>
         <Card />
       </Router>
     );
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('pikachu')).toBeInTheDocument();
+    expect(screen.getByText('electric')).toBeInTheDocument();
+    expect(screen.getByText('static')).toBeInTheDocument();
+    expect(screen.getByText('speed: 90')).toBeInTheDocument();
+    expect(screen.getByText('attack: 55')).toBeInTheDocument();
   });
 
-  test('renders results list and allows clicking', () => {
-    (useOutletContext as jest.Mock).mockReturnValue({
-      pokemon: mockPokemon,
-      results: mockResults,
-      detailsLoading: false,
-    });
-
+  test('should display list of pokemons and handle click', async () => {
     render(
       <Router>
         <Card />
       </Router>
     );
 
-    mockResults.forEach((pokemon) => {
-      expect(screen.getByText(pokemon.name)).toBeInTheDocument();
-    });
+    expect(screen.getByText('bulbasaur')).toBeInTheDocument();
+    expect(screen.getByText('charmander')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Charmander'));
-    expect(screen.getByText('Pikachu')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('bulbasaur'));
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/class-components/bulbasaur?search=y&page=1&id=bulbasaur&details=1'
+      )
+    );
   });
 });
