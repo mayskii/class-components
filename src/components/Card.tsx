@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, resetItems } from '../selectedItemsSlice';
+import { addItem, removeItem } from '../selectedItemsSlice';
 import Pagination from './Pagination';
+import { useTheme } from '../context/useTheme';
 
 interface PokemonDetails {
   description: string;
@@ -50,6 +51,8 @@ const Card: React.FC = () => {
     (state: RootState) => state.selectedItems.selectedItems
   );
 
+  const { theme } = useTheme();
+
   const [isRightSectionVisible, setIsRightSectionVisible] =
     useState<boolean>(true);
 
@@ -79,35 +82,15 @@ const Card: React.FC = () => {
     dispatch(removeItem(pokemon));
   };
 
-  const handleUnselectAll = () => {
-    dispatch(resetItems());
-  };
-
-  const handleDownloadSelected = () => {
-    const selectedData = selectedItems.map((item: Pokemon) => ({
-      name: item.name,
-      url: item.url,
-    }));
-    const csvData = selectedData
-      .map((row: Pokemon) => Object.values(row).join(','))
-      .join('\n');
-
-    const blob = new Blob([csvData], { type: 'taxt/csv' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${selectedItems.length}_selected_pokemon.csv`;
-    link.click();
-  };
-
   if (!pokemon || !details) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="card">
+    <div className={`card ${theme}`}>
       <div className="left-section">
         <div className="pokemon-summary">
-          <table className="card-table">
+          <table className={`card-table ${theme}`}>
             <thead>
               <tr>
                 <th>Item Name</th>
@@ -171,7 +154,7 @@ const Card: React.FC = () => {
           {detailsLoading ? (
             <div className="loading-indicator">Loading...</div>
           ) : (
-            <div className="info">
+            <div className={`info ${theme}`}>
               {detailsLoading && (
                 <div className="pokemon-loader-container">
                   <div className="pokemon-loader"></div>
@@ -214,10 +197,6 @@ const Card: React.FC = () => {
           />
         </div>
       )}
-      <div className="actions">
-        <button onClick={handleDownloadSelected}>Download Selected</button>
-        <button onClick={handleUnselectAll}>Unselect All</button>
-      </div>
     </div>
   );
 };

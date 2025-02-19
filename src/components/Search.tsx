@@ -1,5 +1,6 @@
 import React from 'react';
 import useStorageSearch from '../hooks/useSrorageSearch';
+import { useTheme } from '../context/useTheme';
 
 interface SearchProps {
   onSearch: (term: string) => void;
@@ -7,6 +8,7 @@ interface SearchProps {
 
 const Search: React.FC<SearchProps> = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
+  const { theme } = useTheme();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -30,7 +32,10 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         onChange={handleSearchChange}
         placeholder="Enter search term"
       />
-      <button className="search-button" onClick={handleSearchSubmit}>
+      <button
+        className={theme === 'light' ? 'light' : ''}
+        onClick={handleSearchSubmit}
+      >
         Search
       </button>
     </div>

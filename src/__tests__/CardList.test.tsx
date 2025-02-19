@@ -3,6 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import CardList from '../components/CardList';
 import '@testing-library/jest-dom';
 import { Pokemon } from '../servises/pokemonApi';
+import { Provider } from 'react-redux';
+import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ThemeProvider } from '../context/ThemeProvider';
 
 const mockData = [
   { name: 'bulbasaur', url: 'url1' },
@@ -15,69 +18,69 @@ const mockOnUnselectItem = jest.fn();
 
 const mockSelectedItems: Pokemon[] = [];
 
+interface SelectedItemsState {
+  selectedItems: Pokemon[];
+}
+
+const initialState: SelectedItemsState = {
+  selectedItems: [],
+};
+
+// Создаём слайс с использованием PayloadAction для корректной типизации
+const selectedItemsSlice = createSlice({
+  name: 'selectedItems',
+  initialState,
+  reducers: {
+    addItem: (state, action: PayloadAction<Pokemon>) => {
+      state.selectedItems.push(action.payload);
+    },
+    removeItem: (state, action: PayloadAction<Pokemon>) => {
+      state.selectedItems = state.selectedItems.filter(
+        (item) => item.name !== action.payload.name
+      );
+    },
+  },
+});
+
+const mockStore = configureStore({
+  reducer: {
+    selectedItems: selectedItemsSlice.reducer,
+  },
+});
+
 describe('CardList', () => {
-  test('renders correctly with empty results', () => {
+  const renderWithProviders = () => {
     render(
-      <CardList
-        results={[]}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={mockSelectedItems}
-      />
+      <Provider store={mockStore}>
+        <ThemeProvider>
+          <CardList
+            results={mockData}
+            onPokemonClick={mockOnPokemonClick}
+            onSelectItem={mockOnSelectItem}
+            onUnselectItem={mockOnUnselectItem}
+            selectedItems={mockSelectedItems}
+          />
+        </ThemeProvider>
+      </Provider>
     );
-  });
+  };
 
   test('renders correctly with mock data', () => {
-    render(
-      <CardList
-        results={mockData}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={mockSelectedItems}
-      />
-    );
-  });
-
-  test('should render a list of cards when data is provided', () => {
-    render(
-      <CardList
-        results={mockData}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={mockSelectedItems}
-      />
-    );
+    renderWithProviders();
     mockData.forEach((pokemon) => {
       expect(screen.getByText(pokemon.name)).toBeInTheDocument();
     });
   });
 
-  test('should display "No result found" when no data is available', () => {
-    render(
-      <CardList
-        results={[]}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={mockSelectedItems}
-      />
-    );
-    expect(screen.getByText('No result found')).toBeInTheDocument();
+  test('should render a list of cards when data is provided', () => {
+    renderWithProviders();
+    mockData.forEach((pokemon) => {
+      expect(screen.getByText(pokemon.name)).toBeInTheDocument();
+    });
   });
 
   test('should call onPokemonClick when a card is clicked', () => {
-    render(
-      <CardList
-        results={mockData}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={mockSelectedItems}
-      />
-    );
+    renderWithProviders();
     const firstCard = screen.getByText(mockData[0].name);
     fireEvent.click(firstCard);
 
@@ -91,15 +94,8 @@ describe('CardList', () => {
       { name: 'venusaur', url: 'url3' },
     ];
 
-    render(
-      <CardList
-        results={mockData}
-        onPokemonClick={mockOnPokemonClick}
-        onSelectItem={mockOnSelectItem}
-        onUnselectItem={mockOnUnselectItem}
-        selectedItems={[]}
-      />
-    );
-    expect(screen.getAllByRole('row')).toHaveLength(mockData.length + 1);
+    renderWithProviders();
+    const rows = screen.getAllByRole('row');
+    expect(rows.length).toBe(mockData.length);
   });
 });

@@ -41,6 +41,7 @@ interface SelectedItemsState {
 }
 
 const Main: React.FC<MainProps> = () => {
+  const { theme, toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = useStorageSearch('searchTerm', '');
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -67,8 +68,6 @@ const Main: React.FC<MainProps> = () => {
     useGetPokemonDetailsQuery(
       selectedPokemon ? selectedPokemon.url : skipToken
     );
-
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -155,7 +154,7 @@ const Main: React.FC<MainProps> = () => {
       .map((row: Pokemon) => Object.values(row).join(','))
       .join('\n');
 
-    const blob = new Blob([csvData], { type: 'taxt/csv' });
+    const blob = new Blob([csvData], { type: 'text/csv' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${selectedItems.length}_selected_pokemon.csv`;
@@ -171,9 +170,14 @@ const Main: React.FC<MainProps> = () => {
     <div className={`app-container ${theme}`}>
       {!selectedPokemon && (
         <>
-          <div className="top-controls">
+          <div className={`top-controls ${theme}`}>
             <Search onSearch={handleSearch} />
-            <button onClick={toggleTheme}>Toggle Theme</button>
+            <button
+              className={theme === 'light' ? 'light' : ''}
+              onClick={toggleTheme}
+            >
+              {theme === 'light' ? 'Dark' : 'Light'}
+            </button>
           </div>
 
           {pokemonListLoading && (
@@ -224,7 +228,7 @@ const Main: React.FC<MainProps> = () => {
             </div>
           )}
 
-          <button className="error-button" onClick={triggerError}>
+          <button className={`error-button ${theme}`} onClick={triggerError}>
             Throw Error
           </button>
           {hasError && <ErrorTest />}
@@ -232,9 +236,12 @@ const Main: React.FC<MainProps> = () => {
       )}
       {selectedPokemon && selectedPokemonData && (
         <div className="pokemon-details-container">
-          <div className="close-button" onClick={closePokemonDetails}>
+          <button
+            className={`close-button ${theme}`}
+            onClick={closePokemonDetails}
+          >
             Close
-          </div>
+          </button>
           <Outlet
             context={{
               results: resultsToShow,
@@ -252,10 +259,24 @@ const Main: React.FC<MainProps> = () => {
         </div>
       )}
       {selectedItems.length > 0 && (
-        <div className="flyout">
-          <div>{selectedItems.length} item(s) selected</div>
-          <button onClick={handleUnselectAll}>Unselect all</button>
-          <button onClick={handleDownloadSelected}>Download</button>
+        <div className={`flyout ${theme}`}>
+          <div className="flyout-elements">
+            {selectedItems.length} item(s) selected
+          </div>
+          <div className="flyout-buttons">
+            <button
+              className={theme === 'light' ? 'light' : ''}
+              onClick={handleUnselectAll}
+            >
+              Unselect all
+            </button>
+            <button
+              className={theme === 'light' ? 'light' : ''}
+              onClick={handleDownloadSelected}
+            >
+              Download
+            </button>
+          </div>
         </div>
       )}
     </div>

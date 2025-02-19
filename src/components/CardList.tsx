@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTheme } from '../context/useTheme';
 
 interface PokemonDetails {
   description: string;
@@ -25,8 +26,6 @@ const CardList: React.FC<CardListProps> = ({
   onUnselectItem,
   selectedItems = [],
 }) => {
-  console.log('results:', results);
-
   const handleSelect = (pokemon: Pokemon) => {
     if (selectedItems.some((item) => item.name === pokemon.name)) {
       onUnselectItem(pokemon);
@@ -34,9 +33,11 @@ const CardList: React.FC<CardListProps> = ({
       onSelectItem(pokemon);
     }
   };
+  const { theme } = useTheme();
+
   return (
-    <div className="card-list-container">
-      <table className="card-table">
+    <div className={`card-list-container ${theme}`}>
+      <table className={`card-table ${theme}`}>
         <thead>
           <tr>
             <th>Item Name</th>
@@ -47,7 +48,7 @@ const CardList: React.FC<CardListProps> = ({
         <tbody>
           {results.length === 0 ? (
             <tr>
-              <td colSpan={2}>No result found</td>
+              <td colSpan={3}>No result found</td>
             </tr>
           ) : (
             results.map((pokemon) => (
@@ -69,14 +70,16 @@ const CardList: React.FC<CardListProps> = ({
                         {pokemon.description.description}
                       </p>
                       <p>
-                        <strong>Types:</strong> {pokemon.description.types}
+                        <strong>Types:</strong>{' '}
+                        {pokemon.description.types.join(', ')}
                       </p>
                       <p>
                         <strong>Abilities:</strong>{' '}
-                        {pokemon.description.abilities}
+                        {pokemon.description.abilities.join(', ')}
                       </p>
                       <p>
-                        <strong>Stats:</strong> {pokemon.description.stats}
+                        <strong>Stats:</strong>
+                        {pokemon.description.stats.join(', ')}
                       </p>
                     </>
                   ) : (

@@ -2,12 +2,15 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Pagination from '../components/Pagination';
+import { ThemeProvider } from '../context/ThemeProvider';
 
 describe('Pagination', () => {
   test('renders correctly with basic props', () => {
     const { getByText, getByRole } = render(
       <MemoryRouter>
-        <Pagination currentPage={1} totalPages={5} />
+        <ThemeProvider>
+          <Pagination currentPage={1} totalPages={5} />
+        </ThemeProvider>
       </MemoryRouter>
     );
 
@@ -19,14 +22,18 @@ describe('Pagination', () => {
   test('displays Prev button only when currentPage > 1', () => {
     const { queryByText } = render(
       <MemoryRouter>
-        <Pagination currentPage={1} totalPages={5} />
+        <ThemeProvider>
+          <Pagination currentPage={1} totalPages={5} />
+        </ThemeProvider>
       </MemoryRouter>
     );
     expect(queryByText('Previous')).toBeNull();
 
     const { queryByText: queryByText2 } = render(
       <MemoryRouter>
-        <Pagination currentPage={2} totalPages={5} />
+        <ThemeProvider>
+          <Pagination currentPage={2} totalPages={5} />
+        </ThemeProvider>
       </MemoryRouter>
     );
     expect(queryByText2('Previous')).toBeTruthy();
@@ -35,7 +42,9 @@ describe('Pagination', () => {
   test('should not change page if input value is greater than totalPages', () => {
     const { getByRole, getByText } = render(
       <MemoryRouter>
-        <Pagination currentPage={2} totalPages={5} />
+        <ThemeProvider>
+          <Pagination currentPage={2} totalPages={5} />
+        </ThemeProvider>
       </MemoryRouter>
     );
 
@@ -49,7 +58,9 @@ describe('Pagination', () => {
   test('should not change page if input value is less than 1', () => {
     const { getByRole, getByText } = render(
       <MemoryRouter>
-        <Pagination currentPage={2} totalPages={5} />
+        <ThemeProvider>
+          <Pagination currentPage={2} totalPages={5} />
+        </ThemeProvider>
       </MemoryRouter>
     );
 
@@ -65,11 +76,13 @@ describe('Pagination', () => {
 
     const { getByText } = render(
       <MemoryRouter>
-        <Pagination
-          currentPage={2}
-          totalPages={5}
-          onPageChange={onPageChangeMock}
-        />
+        <ThemeProvider>
+          <Pagination
+            currentPage={2}
+            totalPages={5}
+            onPageChange={onPageChangeMock}
+          />
+        </ThemeProvider>
       </MemoryRouter>
     );
 

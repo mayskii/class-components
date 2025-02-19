@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/useTheme';
 
 interface PaginationProps {
   currentPage: number;
@@ -14,6 +15,7 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const navigate = useNavigate();
   const [inputPage, setInputPage] = useState(currentPage);
+  const { theme } = useTheme();
 
   useEffect(() => {
     setInputPage(currentPage);
@@ -46,7 +48,7 @@ const Pagination: React.FC<PaginationProps> = ({
       {currentPage > 1 && (
         <button
           onClick={() => handlePageChange(currentPage - 1)}
-          className="pagination-button"
+          className={`pagination-button ${theme}`}
         >
           Previous
         </button>
@@ -60,17 +62,17 @@ const Pagination: React.FC<PaginationProps> = ({
         onKeyDown={(e) => {
           if (e.key === 'Enter') handleInputSubmit();
         }}
-        className="page-input"
+        className={`page-input ${theme}`}
         min={1}
         max={totalPages}
       />
-      <span className="page-info">
+      <span className={`page-info ${theme}`}>
         Page {currentPage} of {totalPages}
       </span>
       {currentPage < totalPages && (
         <button
           onClick={() => handlePageChange(currentPage + 1)}
-          className="pagination-button"
+          className={`pagination-button ${theme}`}
         >
           Next
         </button>

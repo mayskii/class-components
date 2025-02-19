@@ -16,6 +16,10 @@
   border-radius: 8px;
 }
 
+.app-container.light {
+  background: linear-gradient(135deg, #f0f0f0, #f0c696);
+}
+
 .top-controls {
   display: flex;
   width: 100%;
@@ -24,13 +28,19 @@
   align-items: center;
   padding: 20px 30px;
   border-radius: 8px;
-  background-color: hsla(0, 0%, 0%, 0.77);
+  background-color: hsla(0, 0%, 0%, 0.8);
+}
+
+.top-controls.light {
+  background: hsla(36, 89%, 15%, 0.5);
+  color: #0c0c0c;
 }
 
 .search-container {
   display: flex;
   width: 100%;
   gap: 40px;
+  margin-right: 40px;
   justify-content: space-between;
   align-items: center;
   max-width: 1100px;
@@ -48,7 +58,7 @@
   margin-left: 0;
 }
 
-.search-button {
+button {
   padding: 12px 20px;
   font-size: 16px;
   background-color: #154a6e;
@@ -58,8 +68,23 @@
   transition: background-color 0.3s ease;
 }
 
-.search-button:hover {
+button:hover {
   background-color: #75a4c4;
+  color: black;
+}
+
+button.light {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #361b0e;
+  color: rgb(249, 247, 247);
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+button.light:hover {
+  background-color:  #6a3b24;
   color: black;
 }
 
@@ -111,23 +136,32 @@
 
 .card-list-container {
   background-color: hsla(0, 0%, 0%, 0.77);
-  padding: 20px 30px;
+  padding: 20px 40px;
   border-radius: 8px;
   width: 100%;
+}
+
+.card-list-container.light {
+  background: hsla(36, 89%, 15%, 0.5);
+  color: #0c0c0c;
 }
 
 .card-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  color: white;
+}
+
+.card-table.light{
+  color: black;
 }
 
 .card-table th,
 .card-table td {
-  color: white;
   padding: 12px 20px;
   border: 1px solid #ddd;
-  text-align: left;
+  text-align: center;
 }
 
 .error-message {
@@ -137,27 +171,15 @@
 }
 
 .error-button {
-  padding: 12px 20px;
-  font-size: 16px;
-  background-color: #154a6e;
-  color: white;
-  cursor: pointer;
   margin-top: 20px;
   margin-right: 0;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-.error-button:hover {
-  background-color: #75a4c4;
-  color: black;
 }
 
 .pagination-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin: 10px;
 }
 
 .page-input {
@@ -166,6 +188,12 @@
   margin: 10px;
   border-radius: 4px;
   font-size: 18px;
+  text-align: center;
+}
+
+.page-input.light{
+  background-color: white;
+  color: black;
 }
 
 .page-info {
@@ -175,20 +203,12 @@
   font-size: 18px;
 }
 
-.pagination-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #154a6e;
-  color: white;
-  cursor: pointer;
-  margin: 0 10px;
-  border: none;
-  transition: background-color 0.3s ease;
+.page-info.light{
+  color: black;
 }
 
-.pagination-button:hover {
-  background-color: #75a4c4;
-  color: black;
+.pagination-button {
+  margin: 0 10px;
 }
 
 .error-boundary {
@@ -217,19 +237,7 @@
 }
 
 .error-boundary button {
-  padding: 10px 20px;
-  font-size: 16px;
   margin-top: 40px;
-  background-color: #154a6e;
-  color: white;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.error-boundary button:hover {
-  background-color: #75a4c4;
 }
 
 .not-found-container {
@@ -269,6 +277,10 @@
   position: relative;
 }
 
+.card.light{
+  background: hsla(36, 89%, 15%, 0.5);
+}
+
 .right-section {
   min-width: 300px;
   justify-content: space-between;
@@ -288,24 +300,17 @@
   margin-top: 20px;
 }
 
+.pokemon-details-container {
+  position: relative;
+}
+
 .close-button {
   display: inline-block;
   position: absolute;
-  right: 26%;
-  margin: 15px;
-  padding: 8px 20px;
-  font-size: 16px;
-  background-color: #154a6e;
-  color: white;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
+  right: 40px;
+  top: 30px;
   transition: background-color 0.3s ease;
   z-index: 100;
-}
-
-.close-button:hover {
-  background-color: #75a4c4;
 }
 
 .pokemon-name {
@@ -315,7 +320,6 @@
 
 .left-section {
   min-width: 200px;
-  background-color: #000000;
   padding: 20px;
   border-radius: 10px;
 }
@@ -344,6 +348,16 @@
   display: grid;
   gap: 20px;
   grid-template-columns: 1fr 1fr 3fr;
+  border-radius: 6px;
+  padding-bottom: 15px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #232e41, #616d85);
+  color: white;
+}
+
+.info.light {
+  background: linear-gradient(135deg, #c7a97d, #86714a);
+  color: white;
 }
 
 .pokemon-types ul,
@@ -406,4 +420,33 @@
 
 .unselect-button:hover {
   background-color: #da190b;
+}
+
+.flyout {
+  display: flex;
+  background-color: hsla(0, 0%, 0%, 0.77);
+  border-radius: 6px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 20px;
+  align-content: center;
+  justify-content: space-between;
+}
+
+.flyout.light {
+  background: hsla(36, 89%, 15%, 0.5);
+  color: #0c0c0c;
+}
+
+.flyout-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-right: 0;
+}
+
+.flyout-elements{
+  display: flex;
+  align-items: center;
+  font-size: 20px;
 }

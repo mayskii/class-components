@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import Card from '../components/Card';
+import { ThemeProvider } from '../context/ThemeProvider';
 
 interface Pokemon {
   name: string;
@@ -56,111 +57,23 @@ const mockStore = configureStore({
 });
 
 describe('Card Component', () => {
+  const renderWithProviders = () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <ThemeProvider>
+            <Card />
+          </ThemeProvider>
+        </BrowserRouter>
+      </Provider>
+    );
+  };
+
   test('renders without crashing and displays Pokemon name', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
+    renderWithProviders();
     const pokemonName = screen.getByText('bulbasaur', {
       selector: 'h2.pokemon-name',
     });
     expect(pokemonName).toBeTruthy();
-  });
-
-  it('renders the "Download Selected" button', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const downloadButton = screen.getByText('Download Selected');
-    expect(downloadButton).toBeTruthy();
-  });
-  it('renders without crashing and displays Pokemon name', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const pokemonName = screen.getByText('bulbasaur', {
-      selector: 'h2.pokemon-name',
-    });
-    expect(pokemonName).toBeTruthy();
-  });
-
-  it('renders the "Download Selected" button', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const downloadButton = screen.getByText('Download Selected');
-    expect(downloadButton).toBeTruthy();
-  });
-
-  it('renders the "Unselect All" button', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const unselectButton = screen.getByText('Unselect All');
-    expect(unselectButton).toBeTruthy();
-  });
-  it('renders without crashing and displays Pokemon name', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const pokemonName = screen.getByText('bulbasaur', {
-      selector: 'h2.pokemon-name',
-    });
-    expect(pokemonName).toBeTruthy();
-  });
-
-  it('renders the "Download Selected" button', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const downloadButton = screen.getByText('Download Selected');
-    expect(downloadButton).toBeTruthy();
-  });
-
-  it('renders the "Unselect All" button', () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <Card />
-        </BrowserRouter>
-      </Provider>
-    );
-
-    const unselectButton = screen.getByText('Unselect All');
-    expect(unselectButton).toBeTruthy();
   });
 });
