@@ -13,6 +13,7 @@ import {
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, resetItems } from '../selectedItemsSlice';
+import { useTheme } from '../context/useTheme';
 
 interface MainProps {
   searchTerm?: string;
@@ -66,6 +67,8 @@ const Main: React.FC<MainProps> = () => {
     useGetPokemonDetailsQuery(
       selectedPokemon ? selectedPokemon.url : skipToken
     );
+
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -165,11 +168,12 @@ const Main: React.FC<MainProps> = () => {
   );
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${theme}`}>
       {!selectedPokemon && (
         <>
           <div className="top-controls">
             <Search onSearch={handleSearch} />
+            <button onClick={toggleTheme}>Toggle Theme</button>
           </div>
 
           {pokemonListLoading && (

@@ -4,6 +4,7 @@ import Main from './components/Main';
 import Card from './components/Card';
 import NotFoundPage from './components/NotFoundPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ThemeProvider } from './context/ThemeProvider';
 import './App.css';
 
 const App: React.FC = () => {
@@ -11,14 +12,16 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary resetError={resetError}>
-      <Router>
-        <Routes>
-          <Route path="/class-components/" element={<Main searchTerm="" />}>
-            <Route path=":id" element={<Card />} />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/class-components/" element={<Main searchTerm="" />}>
+              <Route path=":id" element={<Card />} />
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 };

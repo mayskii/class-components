@@ -1,25 +1,21 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom'; // To wrap the component with a router
+import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit'; // Use configureStore instead of createStore
-import Card from '../components/Card'; // Adjust the path according to your file structure
+import { configureStore } from '@reduxjs/toolkit';
+import Card from '../components/Card';
 
-// Define the Pokemon type
 interface Pokemon {
   name: string;
   url: string;
 }
 
-// Define the initial state type
 interface SelectedItemsState {
   selectedItems: Pokemon[];
 }
 
-// Define the reducer action type (for now we use a generic 'any' type for action)
 type Action = { type: string };
 
-// Mocking the outlet context to avoid breaking the test (use mock data)
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useOutletContext: () => ({
@@ -39,7 +35,6 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-// Create a mock reducer and initial state for the store
 const initialState: SelectedItemsState = {
   selectedItems: [],
 };
@@ -61,6 +56,33 @@ const mockStore = configureStore({
 });
 
 describe('Card Component', () => {
+  test('renders without crashing and displays Pokemon name', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const pokemonName = screen.getByText('bulbasaur', {
+      selector: 'h2.pokemon-name',
+    });
+    expect(pokemonName).toBeTruthy();
+  });
+
+  it('renders the "Download Selected" button', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const downloadButton = screen.getByText('Download Selected');
+    expect(downloadButton).toBeTruthy();
+  });
   it('renders without crashing and displays Pokemon name', () => {
     render(
       <Provider store={mockStore}>
@@ -70,10 +92,75 @@ describe('Card Component', () => {
       </Provider>
     );
 
-    // Check if the Pokemon name is visible in the card
     const pokemonName = screen.getByText('bulbasaur', {
       selector: 'h2.pokemon-name',
     });
     expect(pokemonName).toBeTruthy();
+  });
+
+  it('renders the "Download Selected" button', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const downloadButton = screen.getByText('Download Selected');
+    expect(downloadButton).toBeTruthy();
+  });
+
+  it('renders the "Unselect All" button', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const unselectButton = screen.getByText('Unselect All');
+    expect(unselectButton).toBeTruthy();
+  });
+  it('renders without crashing and displays Pokemon name', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const pokemonName = screen.getByText('bulbasaur', {
+      selector: 'h2.pokemon-name',
+    });
+    expect(pokemonName).toBeTruthy();
+  });
+
+  it('renders the "Download Selected" button', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const downloadButton = screen.getByText('Download Selected');
+    expect(downloadButton).toBeTruthy();
+  });
+
+  it('renders the "Unselect All" button', () => {
+    render(
+      <Provider store={mockStore}>
+        <BrowserRouter>
+          <Card />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    const unselectButton = screen.getByText('Unselect All');
+    expect(unselectButton).toBeTruthy();
   });
 });
