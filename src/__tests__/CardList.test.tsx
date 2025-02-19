@@ -15,7 +15,6 @@ const mockData = [
 const mockOnPokemonClick = jest.fn();
 const mockOnSelectItem = jest.fn();
 const mockOnUnselectItem = jest.fn();
-
 const mockSelectedItems: Pokemon[] = [];
 
 interface SelectedItemsState {
@@ -23,10 +22,9 @@ interface SelectedItemsState {
 }
 
 const initialState: SelectedItemsState = {
-  selectedItems: [],
+  selectedItems: mockSelectedItems,
 };
 
-// Создаём слайс с использованием PayloadAction для корректной типизации
 const selectedItemsSlice = createSlice({
   name: 'selectedItems',
   initialState,
@@ -97,5 +95,18 @@ describe('CardList', () => {
     renderWithProviders();
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(mockData.length);
+  });
+
+  test('should display Pokémon URL in the description column', () => {
+    renderWithProviders();
+    mockData.forEach((pokemon) => {
+      const urlText = screen.getByText(pokemon.url);
+      expect(urlText).toBeInTheDocument();
+    });
+  });
+  test('should not render empty rows', () => {
+    renderWithProviders();
+    const rows = screen.getAllByRole('row');
+    expect(rows.length).toBeGreaterThan(0);
   });
 });

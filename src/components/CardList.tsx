@@ -36,12 +36,12 @@ const CardList: React.FC<CardListProps> = ({
   const { theme } = useTheme();
 
   return (
-    <div className={`card-list-container ${theme}`}>
+    <div className={`card-list-container ${theme}`} data-testid="card-list">
       <table className={`card-table ${theme}`}>
         <thead>
           <tr>
             <th>Item Name</th>
-            <th>Item Description</th>
+            <th>Item Description(URL)</th>
             <th>Select</th>
           </tr>
         </thead>
@@ -63,24 +63,10 @@ const CardList: React.FC<CardListProps> = ({
               >
                 <td>{pokemon.name}</td>
                 <td>
-                  {pokemon.description ? (
+                  {pokemon ? (
                     <>
-                      <p>
-                        <strong>Description:</strong>{' '}
-                        {pokemon.description.description}
-                      </p>
-                      <p>
-                        <strong>Types:</strong>{' '}
-                        {pokemon.description.types.join(', ')}
-                      </p>
-                      <p>
-                        <strong>Abilities:</strong>{' '}
-                        {pokemon.description.abilities.join(', ')}
-                      </p>
-                      <p>
-                        <strong>Stats:</strong>
-                        {pokemon.description.stats.join(', ')}
-                      </p>
+                      <strong>URL:</strong>{' '}
+                      <a href={pokemon.url}>{pokemon.url}</a>
                     </>
                   ) : (
                     <p>No details available</p>
