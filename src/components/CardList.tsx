@@ -74,6 +74,7 @@ const CardList: React.FC<CardListProps> = ({
                 </td>
                 <td>
                   <button
+                    data-testid={`select-button-${pokemon.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSelect(pokemon);

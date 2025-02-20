@@ -23,7 +23,6 @@ test('renders the component', async () => {
 });
 
 test('renders the error button and triggers an error', () => {
-  // Мокаем resetError, чтобы проверить его вызов
   const mockResetError = jest.fn();
 
   render(
@@ -58,7 +57,6 @@ test('renders the error button and triggers an error', () => {
 });
 
 test('theme toggles between light and dark on button click', () => {
-  // Рендерим компонент Main
   const { container } = render(
     <Provider store={store}>
       <ThemeProvider>
@@ -69,24 +67,18 @@ test('theme toggles between light and dark on button click', () => {
     </Provider>
   );
 
-  // Ищем кнопку для переключения темы
   const themeToggleButton = screen.getByRole('button', { name: /light/i });
 
-  // Проверяем, что тема изначально light
   let appContainer = container.querySelector('.app-container');
-  expect(appContainer).toHaveClass('app-container dark'); // Проверяем, что класс "light" есть
+  expect(appContainer).toHaveClass('app-container dark');
 
-  // Кликаем на кнопку для смены темы
   fireEvent.click(themeToggleButton);
 
-  // После клика проверяем, что класс изменился на dark
   appContainer = container.querySelector('.app-container');
-  expect(appContainer).toHaveClass('app-container light'); // Проверяем, что класс "dark" появился
+  expect(appContainer).toHaveClass('app-container light');
 
-  // Кликаем снова для переключения обратно на светлую тему
   fireEvent.click(themeToggleButton);
 
-  // Проверяем, что класс снова light
   appContainer = container.querySelector('.app-container');
   expect(appContainer).toHaveClass('app-container dark');
 });

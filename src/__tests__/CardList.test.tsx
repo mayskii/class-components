@@ -109,4 +109,84 @@ describe('CardList', () => {
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBeGreaterThan(0);
   });
+
+  test('renders list of Pokémon cards with URLs and select buttons', () => {
+    renderWithProviders();
+
+    mockData.forEach((pokemon) => {
+      expect(screen.getByText(pokemon.name)).toBeInTheDocument();
+      expect(screen.getByText(pokemon.url)).toBeInTheDocument();
+
+      expect(
+        screen.getByTestId(`select-button-${pokemon.name}`)
+      ).toBeInTheDocument();
+    });
+  });
+  test('should display "No result found" when results is empty', () => {
+    renderWithProviders();
+
+    // Обновляем данные, чтобы results было пустым
+    const emptyData: Pokemon[] = [];
+
+    render(
+      <Provider store={mockStore}>
+        <ThemeProvider>
+          <CardList
+            results={emptyData}
+            onPokemonClick={mockOnPokemonClick}
+            onSelectItem={mockOnSelectItem}
+            onUnselectItem={mockOnUnselectItem}
+            selectedItems={mockSelectedItems}
+          />
+        </ThemeProvider>
+      </Provider>
+    );
+
+    expect(screen.getByText('No result found')).toBeInTheDocument();
+  });
+
+  test('should render pokemon details when results is populated', () => {
+    renderWithProviders();
+
+    mockData.forEach((pokemon) => {
+      expect(screen.getByText(pokemon.name)).toBeInTheDocument();
+      expect(screen.getByText(pokemon.url)).toBeInTheDocument();
+    });
+  });
+
+  test('should call onUnselectItem when a Pokemon is already selected', () => {
+    const mockOnSelectItem = jest.fn();
+    const mockOnUnselectItem = jest.fn();
+    const mockData = [
+      { name: 'bulbasaur', url: 'url1' },
+      { name: 'ivysaur', url: 'url2' },
+    ];
+
+    const mockSelectedItems = [mockData[0]];
+
+    const renderWithProviders = () => {
+      render(
+        <Provider store={mockStore}>
+          <ThemeProvider>
+            <CardList
+              results={mockData}
+              onPokemonClick={mockOnPokemonClick}
+              onSelectItem={mockOnSelectItem}
+              onUnselectItem={mockOnUnselectItem}
+              selectedItems={mockSelectedItems}
+            />
+          </ThemeProvider>
+        </Provider>
+      );
+    };
+
+    renderWithProviders();
+
+    const unselectButton = screen.getAllByText('Unselect')[0];
+
+    fireEvent.click(unselectButton);
+
+    expect(mockOnUnselectItem).toHaveBeenCalledWith(mockData[0]);
+    expect(mockOnSelectItem).not.toHaveBeenCalled();
+  });
 });
