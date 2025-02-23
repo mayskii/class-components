@@ -1,10 +1,11 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import Card from '../components/Card';
 import { ThemeProvider } from '../context/ThemeProvider';
+import '@testing-library/jest-dom';
 
 interface Pokemon {
   name: string;
@@ -75,5 +76,37 @@ describe('Card Component', () => {
       selector: 'h2.pokemon-name',
     });
     expect(pokemonName).toBeTruthy();
+  });
+
+  test('Selects and unselects Pokemon correctly using class', async () => {
+    renderWithProviders();
+
+    const selectButton = screen.getByRole('button', { name: /Select/i });
+    expect(selectButton).toBeInTheDocument();
+
+    fireEvent.click(selectButton);
+
+    const unselectButton = document.querySelector('.unselect-button');
+    expect(unselectButton).toBeNull();
+
+    if (unselectButton) {
+      fireEvent.click(unselectButton);
+    }
+
+    const selectButtonAfterUnselect = document.querySelector('.select-button');
+    expect(selectButtonAfterUnselect).not.toBeNull();
+  });
+
+  test('renders Pokemon types, abilities, and stats', () => {
+    renderWithProviders();
+
+    const types = screen.getByText(/Types/i);
+    expect(types).toBeInTheDocument();
+
+    const abilities = screen.getByText(/Abilities/i);
+    expect(abilities).toBeInTheDocument();
+
+    const stats = screen.getByText(/Stats/i);
+    expect(stats).toBeInTheDocument();
   });
 });
