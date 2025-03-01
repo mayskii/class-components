@@ -3,17 +3,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import CardList from './CardList';
 import Search from './Search';
 import ErrorTest from './ErrorTest';
-import useStorageSearch from '../hooks/useSrorageSearch';
+import useStorageSearch from '../src/hooks/useSrorageSearch';
 import Pagination from './Pagination';
 import { Outlet } from 'react-router-dom';
 import {
   useGetPokemonListQuery,
   useGetPokemonDetailsQuery,
-} from '../servises/pokemonApi';
+} from '../src/servises/pokemonApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem, resetItems } from '../selectedItemsSlice';
-import { useTheme } from '../context/useTheme';
+import { addItem, removeItem, resetItems } from '../src/selectedItemsSlice';
+import { useTheme } from '../src/context/useTheme';
 
 interface MainProps {
   searchTerm?: string;

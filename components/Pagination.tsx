@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/useTheme';
+import { useTheme } from '../src/context/useTheme';
 
 interface PaginationProps {
   currentPage: number;

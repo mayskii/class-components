@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem } from '../src/selectedItemsSlice';
 import Pagination from './Pagination';

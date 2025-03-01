@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '../context/useTheme';
+import { useTheme } from '../src/context/useTheme';
 
 interface PokemonDetails {
   description: string;

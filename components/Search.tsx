@@ -1,6 +1,6 @@
 import React from 'react';
-import useStorageSearch from '../hooks/useSrorageSearch';
-import { useTheme } from '../context/useTheme';
+import useStorageSearch from '../src/hooks/useSrorageSearch';
+import { useTheme } from '../src/context/useTheme';
 
 interface SearchProps {
   onSearch: (term: string) => void;
