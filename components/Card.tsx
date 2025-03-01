@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem, removeItem } from '../selectedItemsSlice';
+import { addItem, removeItem } from '../src/selectedItemsSlice';
 import Pagination from './Pagination';
-import { useTheme } from '../context/useTheme';
+import { useTheme } from '../src/context/useTheme';
 
 interface PokemonDetails {
   description: string;
