@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem } from '../src/selectedItemsSlice';
 import Pagination from './Pagination';
@@ -25,63 +26,61 @@ interface RootState {
   selectedItems: SelectedItemsState;
 }
 
-const Card: React.FC = () => {
-  const {
-    pokemon,
-    detailsLoading,
-    details,
-    results,
-    currentPage,
-    totalPages,
-    onPageChange,
-  } = useOutletContext<{
-    pokemon: Pokemon | null;
-    details: PokemonDetails | null;
-    detailsLoading: boolean;
-    results: Pokemon[];
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-  }>();
+interface CardProps {
+  pokemon: Pokemon | null;
+  details: PokemonDetails | null;
+  detailsLoading: boolean;
+  results: Pokemon[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 
-  const navigate = useNavigate();
+const Card: React.FC<CardProps> = ({
+  pokemon,
+  details,
+  detailsLoading,
+  results,
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
+  console.log('🔹 Rendering Card component');
+  console.log('➡️ Pokemon:', pokemon);
+  console.log('➡️ Details:', details);
+  console.log('➡️ Details Loading:', detailsLoading);
+  console.log('➡️ Results:', results);
+
   const dispatch = useDispatch();
   const selectedItems = useSelector(
     (state: RootState) => state.selectedItems.selectedItems
   );
-
   const { theme } = useTheme();
-
   const [isRightSectionVisible, setIsRightSectionVisible] =
     useState<boolean>(true);
 
   useEffect(() => {
+    console.log('✅ Card component mounted');
+
     if (pokemon && pokemon.url) {
       setIsRightSectionVisible(true);
     }
   }, [pokemon]);
 
-  const handlePokemonClick = (selectedPokemon: Pokemon) => {
-    setIsRightSectionVisible(true);
-    navigate(
-      `/class-components/${selectedPokemon.name}?search=y&page=1&id=${selectedPokemon.name}&details=1`
-    );
-  };
-
-  const handlePageChange = (newPage: number) => {
-    onPageChange(newPage);
-    navigate(`?page=${newPage}`);
-  };
-
   const handleSelectItem = (pokemon: Pokemon) => {
+    console.log('✅ Pokemon detected:', pokemon);
+
     dispatch(addItem(pokemon));
   };
 
   const handleUnselectItem = (pokemon: Pokemon) => {
+    console.log('✔️ Selecting item:', pokemon.name);
     dispatch(removeItem(pokemon));
   };
 
   if (!pokemon || !details) {
+    console.log('⚠️ No pokemon or details found, showing loading...');
+
     return <div>Loading...</div>;
   }
 
@@ -105,10 +104,15 @@ const Card: React.FC = () => {
                 results.map((pokemon) => (
                   <tr
                     key={pokemon.name}
-                    onClick={() => handlePokemonClick(pokemon)}
                     className={`card-item ${selectedItems.some((item) => item.name === pokemon.name) ? 'selected' : ''}`}
                   >
-                    <td>{pokemon.name}</td>
+                    <td>
+                      <Link
+                        href={`/class-components/${pokemon.name}?search=y&page=1&id=${pokemon.name}&details=1`}
+                      >
+                        {pokemon.name}
+                      </Link>
+                    </td>
 
                     <td>
                       <button
@@ -192,7 +196,7 @@ const Card: React.FC = () => {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={onPageChange}
           />
         </div>
       )}

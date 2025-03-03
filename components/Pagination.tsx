@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { useTheme } from '../src/context/useTheme';
 
 interface PaginationProps {
@@ -13,7 +13,7 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [inputPage, setInputPage] = useState(currentPage);
   const { theme } = useTheme();
 
@@ -26,7 +26,7 @@ const Pagination: React.FC<PaginationProps> = ({
       if (onPageChange) {
         onPageChange(page);
       }
-      navigate(`?page=${page}`);
+      router.push(`?page=${page}`);
     }
   };
 

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import CardList from './CardList';
 import Search from './Search';
 import ErrorTest from './ErrorTest';
 import useStorageSearch from '../src/hooks/useSrorageSearch';
 import Pagination from './Pagination';
-import { Outlet } from 'react-router-dom';
 import {
   useGetPokemonListQuery,
   useGetPokemonDetailsQuery,
@@ -47,8 +46,7 @@ const Main: React.FC<MainProps> = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [hasError, setHasError] = useState<boolean>(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const selectedItems = useSelector(
@@ -64,10 +62,9 @@ const Main: React.FC<MainProps> = () => {
     searchTerm,
   });
 
-  const { data: selectedPokemonData, isLoading: selectedPokemonLoading } =
-    useGetPokemonDetailsQuery(
-      selectedPokemon ? selectedPokemon.url : skipToken
-    );
+  const { data: selectedPokemonData } = useGetPokemonDetailsQuery(
+    selectedPokemon ? selectedPokemon.name : skipToken
+  );
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -88,22 +85,23 @@ const Main: React.FC<MainProps> = () => {
     } else if (search) {
       setCurrentPage(Number(page));
     }
-  }, [location.search, searchTerm, setSearchTerm]);
+  }, [router.query, searchTerm, setSearchTerm]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
-    navigate(`?search=${term}&page=1`);
+    router.push(`?search=${term}&page=1`);
   };
   const handlePokemonClick = (pokemon: Pokemon) => {
     setSelectedPokemon(pokemon);
-    const navigateTo = `${pokemon.name}?search=${searchTerm}&page=${currentPage}&id=${pokemon.name}&details=1`;
-    navigate(navigateTo);
+    router.push(
+      `/class-components/${pokemon.name}?search=${searchTerm}&page=${currentPage}&id=${pokemon.name}&details=1`
+    );
   };
 
   const closePokemonDetails = () => {
     setSelectedPokemon(null);
-    navigate('?search=' + searchTerm + '&page=1');
+    router.push('?search=' + searchTerm + '&page=1');
   };
 
   const triggerError = () => {
@@ -166,6 +164,12 @@ const Main: React.FC<MainProps> = () => {
     currentPage * 20
   );
 
+  console.log('📌 API Response:', pokemonListResponse);
+  console.log('🔎 Отфильтрованные результаты:', filteredResults);
+  console.log('🟢 Передаем в CardList resultsToShow:', resultsToShow);
+  console.log('🔹 selectedPokemon:', selectedPokemon);
+  console.log('🔹 selectedPokemonData:', selectedPokemonData);
+
   return (
     <div className={`app-container ${theme}`}>
       {!selectedPokemon && (
@@ -222,7 +226,7 @@ const Main: React.FC<MainProps> = () => {
                 totalPages={totalPages}
                 onPageChange={(page) => {
                   setCurrentPage(page);
-                  navigate(`?page=${page}`);
+                  router.push(`?page=${page}`);
                 }}
               />
             </div>
@@ -242,20 +246,6 @@ const Main: React.FC<MainProps> = () => {
           >
             Close
           </button>
-          <Outlet
-            context={{
-              results: resultsToShow,
-              pokemon: selectedPokemon,
-              details: selectedPokemonData,
-              detailsLoading: selectedPokemonLoading,
-              currentPage: currentPage,
-              totalPages: totalPages,
-              onPageChange: (page: number) => {
-                setCurrentPage(page);
-                navigate(`?page=${page}`);
-              },
-            }}
-          />
         </div>
       )}
       {selectedItems.length > 0 && (

@@ -60,26 +60,32 @@ export const pokemonApi = createApi({
     }),
 
     getPokemonDetails: builder.query<PokemonDetails, string>({
-      query: (url) => url,
+      query: (name) => `pokemon/${name}`,
       transformResponse: (response: {
         flavor_text_entries: FlavorTextEntry[];
         types: Type[];
         abilities: Ability[];
         stats: Stat[];
       }) => {
+        if (!response) {
+          throw new Error('No data received');
+        }
+
         const flavorTextEntries: FlavorTextEntry[] =
           response.flavor_text_entries;
         const description =
           flavorTextEntries?.find((entry) => entry.language.name === 'en')
             ?.flavor_text || 'No description available';
 
-        const types = response.types.map((type: Type) => type.type.name);
-        const abilities = response.abilities.map(
-          (ability: Ability) => ability.ability.name
-        );
-        const stats = response.stats.map(
-          (stat: Stat) => `${stat.stat.name}: ${stat.base_stat}`
-        );
+        const types = response.types
+          ? response.types.map((type) => type.type.name)
+          : [];
+        const abilities = response.abilities
+          ? response.abilities.map((ability) => ability.ability.name)
+          : [];
+        const stats = response.stats
+          ? response.stats.map((stat) => `${stat.stat.name}: ${stat.base_stat}`)
+          : [];
 
         return {
           description,
