@@ -33,6 +33,9 @@ const Card: React.FC<CardProps> = ({ pokemon, details, detailsLoading }) => {
         <div className="loading-indicator">Loading...</div>
       ) : (
         <div className={`info ${theme}`}>
+          <div className="pokemon-name">
+            <ul>{pokemon.name}</ul>
+          </div>
           <div className="pokemon-types">
             <h3>Types</h3>
             <ul>

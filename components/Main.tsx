@@ -188,7 +188,9 @@ const Main: React.FC<MainProps> = () => {
           !pokemonListError &&
           filteredResults.length > 0 && (
             <div className="main-content">
-              <div className="main-section">
+              <div
+                className={`main-section ${!selectedPokemon ? 'right-section-hidden' : ''}`}
+              >
                 <div className="left-section">
                   <CardList
                     results={resultsToShow}
@@ -198,15 +200,26 @@ const Main: React.FC<MainProps> = () => {
                     selectedItems={selectedItems}
                   />
                 </div>
-                <div className="right-section">
-                  {selectedPokemon && selectedPokemonData && (
+
+                {selectedPokemon && selectedPokemonData && (
+                  <div className="right-section">
+                    {selectedPokemon && selectedPokemonData && (
+                      <div className="pokemon-details-container">
+                        <button
+                          className={`close-button ${theme}`}
+                          onClick={closePokemonDetails}
+                        >
+                          Close
+                        </button>
+                      </div>
+                    )}
                     <Card
                       pokemon={selectedPokemon}
                       details={selectedPokemonData}
                       detailsLoading={pokemonDetailsLoading}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -236,16 +249,6 @@ const Main: React.FC<MainProps> = () => {
         {hasError && <ErrorTest />}
       </>
 
-      {selectedPokemon && selectedPokemonData && (
-        <div className="pokemon-details-container">
-          <button
-            className={`close-button ${theme}`}
-            onClick={closePokemonDetails}
-          >
-            Close
-          </button>
-        </div>
-      )}
       {selectedItems.length > 0 && (
         <div className={`flyout ${theme}`}>
           <div className="flyout-elements">
