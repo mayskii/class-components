@@ -1,9 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import {
-  useGetPokemonDetailsQuery,
-  useGetPokemonListQuery,
-} from '../../src/servises/pokemonApi';
+import { useGetPokemonDetailsQuery } from '../../src/servises/pokemonApi';
 import Card from '../../components/Card';
 
 const CardPage = () => {
@@ -18,17 +15,8 @@ const CardPage = () => {
     isLoading: pokemonDetailsLoading,
   } = useGetPokemonDetailsQuery(pokemonName);
 
-  const {
-    data: pokemonListResponse,
-    error: pokemonListError,
-    isLoading: pokemonListLoading,
-  } = useGetPokemonListQuery({
-    page: 1,
-    searchTerm: '',
-  });
-
-  if (pokemonDetailsLoading || pokemonListLoading) return <p>Loading...</p>;
-  if (pokemonDetailsError || pokemonListError) return <p>Error loading data</p>;
+  if (pokemonDetailsLoading) return <p>Loading...</p>;
+  if (pokemonDetailsError) return <p>Error loading data</p>;
 
   const details = selectedPokemonData || {
     description: 'No description available',
@@ -37,22 +25,14 @@ const CardPage = () => {
     stats: ['Unknown'],
   };
 
-  const pokemon = {
-    name: pokemonName,
-    url: `https://pokeapi.co/api/v2/pokemon/${pokemonName}/`,
-  };
-
-  const results = pokemonListResponse?.results || [];
-
   return (
     <Card
-      pokemon={pokemon}
+      pokemon={{
+        name: pokemonName,
+        url: `https://pokeapi.co/api/v2/pokemon/${pokemonName}/`,
+      }}
       details={details}
       detailsLoading={pokemonDetailsLoading}
-      results={results}
-      currentPage={1}
-      totalPages={1}
-      onPageChange={() => {}}
     />
   );
 };

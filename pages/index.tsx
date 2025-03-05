@@ -1,8 +1,13 @@
 import React from 'react';
-import Main from '../components/Main';
+import Link from 'next/link';
 
-const ClassComponents = () => {
-  return <Main searchTerm="" />;
+const HomePage = () => {
+  return (
+    <div>
+      <h1>Welcome to the Pokémon App!</h1>
+      <Link href="/class-components">Go!!!</Link>
+    </div>
+  );
 };
 
-export default ClassComponents;
+export default HomePage;

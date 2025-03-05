@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTheme } from '../src/context/useTheme';
-import Link from 'next/link';
 
 interface PokemonDetails {
   description: string;
@@ -62,13 +61,7 @@ const CardList: React.FC<CardListProps> = ({
                     : ''
                 }
               >
-                <td>
-                  <Link
-                    href={`/class-components/${pokemon.name}?search=y&page=1&id=${pokemon.name}&details=1`}
-                  >
-                    {pokemon.name}
-                  </Link>
-                </td>
+                <td>{pokemon.name}</td>
                 <td>
                   {pokemon ? (
                     <>
