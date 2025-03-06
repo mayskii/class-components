@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "target": "es5",
+    "module": "commonjs",
     "moduleResolution": "Node",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "target": "ESNext",
-    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -15,16 +16,17 @@
     ],
     "allowJs": true,
     "noEmit": true,
-    "incremental": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "jest.setup.js"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".next",
+    "dist"
   ]
 }

@@ -159,7 +159,7 @@ const Main: React.FC<MainProps> = () => {
   );
 
   return (
-    <div className={`app-container ${theme}`}>
+    <div className={`app-container ${theme}`} data-testid="app-container">
       <>
         <div className={`top-controls ${theme}`}>
           <Search onSearch={handleSearch} />

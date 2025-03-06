@@ -3,82 +3,42 @@ import { render, fireEvent } from '@testing-library/react';
 import { ThemeProvider } from '../context/ThemeProvider';
 import { ThemeContext } from '../context/ThemeContext';
 
-describe('ThemeProvider Component', () => {
-  test('should have dark theme by default', () => {
-    const { container } = render(
+describe('ThemeProvider', () => {
+  test('должен иметь тему "dark" по умолчанию', () => {
+    const { getByTestId } = render(
       <ThemeProvider>
         <ThemeContext.Consumer>
-          {(context) => {
-            if (!context) return null;
-            return <div>{context.theme}</div>;
-          }}
+          {(context) => <div data-testid="theme">{context?.theme}</div>}
         </ThemeContext.Consumer>
       </ThemeProvider>
     );
 
-    const themeDiv = container.querySelector('div');
-    expect(themeDiv?.textContent).toBe('dark');
+    expect(getByTestId('theme').textContent).toBe('dark');
   });
 
-  test('should toggle theme to light', () => {
-    const { container } = render(
+  test('должен переключать тему с "dark" на "light" и обратно', () => {
+    const { getByTestId, getByRole } = render(
       <ThemeProvider>
         <ThemeContext.Consumer>
-          {(context) => {
-            if (!context) return null;
-            return (
-              <div>
-                <div>{context.theme}</div>
-                <button onClick={context.toggleTheme}>Toggle Theme</button>
-              </div>
-            );
-          }}
+          {(context) => (
+            <div>
+              <div data-testid="theme">{context?.theme}</div>
+              <button onClick={context?.toggleTheme}>Toggle Theme</button>
+            </div>
+          )}
         </ThemeContext.Consumer>
       </ThemeProvider>
     );
 
-    const themeDiv = container.querySelector('div');
-    expect(themeDiv?.textContent).toBe('darkToggle Theme');
+    const themeDiv = getByTestId('theme');
+    const toggleButton = getByRole('button', { name: /toggle theme/i });
 
-    const button = container.querySelector('button');
-    if (button) {
-      fireEvent.click(button);
-    }
+    expect(themeDiv.textContent).toBe('dark');
 
-    expect(themeDiv?.textContent).toBe('lightToggle Theme');
-  });
+    fireEvent.click(toggleButton);
+    expect(themeDiv.textContent).toBe('light');
 
-  test('should toggle theme back to dark', () => {
-    const { container } = render(
-      <ThemeProvider>
-        <ThemeContext.Consumer>
-          {(context) => {
-            if (!context) return null;
-            return (
-              <div>
-                <div>{context.theme}</div>
-                <button onClick={context.toggleTheme}>Toggle Theme</button>
-              </div>
-            );
-          }}
-        </ThemeContext.Consumer>
-      </ThemeProvider>
-    );
-
-    const themeDiv = container.querySelector('div');
-    expect(themeDiv?.textContent).toBe('darkToggle Theme');
-
-    const button = container.querySelector('button');
-    if (button) {
-      fireEvent.click(button);
-    }
-
-    expect(themeDiv?.textContent).toBe('lightToggle Theme');
-
-    if (button) {
-      fireEvent.click(button);
-    }
-
-    expect(themeDiv?.textContent).toBe('darkToggle Theme');
+    fireEvent.click(toggleButton);
+    expect(themeDiv.textContent).toBe('dark');
   });
 });

@@ -1,6 +1,5 @@
-import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import CardList from '../components/CardList';
+import CardList from '../../components/CardList';
 import '@testing-library/jest-dom';
 import { Pokemon } from '../servises/pokemonApi';
 import { Provider } from 'react-redux';

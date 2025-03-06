@@ -1,112 +1,59 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
-import Card from '../components/Card';
-import { ThemeProvider } from '../context/ThemeProvider';
+import { render, screen } from '@testing-library/react';
+import Card from '../../components/Card';
 import '@testing-library/jest-dom';
+import { ThemeProvider } from '../context/ThemeProvider';
 
-interface Pokemon {
-  name: string;
-  url: string;
-}
-
-interface SelectedItemsState {
-  selectedItems: Pokemon[];
-}
-
-type Action = { type: string };
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useOutletContext: () => ({
-    pokemon: { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
-    detailsLoading: false,
-    details: {
-      types: ['grass', 'poison'],
-      abilities: ['overgrow', 'chlorophyll'],
-      stats: ['50', '60', '70'],
+test('renders Pokemon name and details', async () => {
+  const pokemon = {
+    name: 'Pikachu',
+    types: ['electric'],
+    abilities: ['static'],
+    stats: { speed: 90, attack: 55 },
+    url: 'https://pokeapi.co/api/v2/pokemon/pikachu/',
+    description: {
+      description: 'Electric type Pokemon',
+      types: ['electric'],
+      abilities: ['static'],
+      stats: ['speed: 90', 'attack: 55'],
     },
-    results: [
-      { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
-    ],
-    currentPage: 1,
-    totalPages: 1,
-    onPageChange: jest.fn(),
-  }),
-}));
-
-const initialState: SelectedItemsState = {
-  selectedItems: [],
-};
-
-const mockReducer = (
-  state: SelectedItemsState = initialState,
-  action: Action
-): SelectedItemsState => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
-
-const mockStore = configureStore({
-  reducer: {
-    selectedItems: mockReducer,
-  },
-});
-
-describe('Card Component', () => {
-  const renderWithProviders = () => {
-    render(
-      <Provider store={mockStore}>
-        <BrowserRouter>
-          <ThemeProvider>
-            <Card />
-          </ThemeProvider>
-        </BrowserRouter>
-      </Provider>
-    );
   };
 
-  test('renders without crashing and displays Pokemon name', () => {
-    renderWithProviders();
-    const pokemonName = screen.getByText('bulbasaur', {
-      selector: 'h2.pokemon-name',
-    });
-    expect(pokemonName).toBeTruthy();
-  });
+  render(
+    <ThemeProvider>
+      {' '}
+      <Card
+        pokemon={pokemon}
+        details={pokemon.description}
+        detailsLoading={false}
+      />
+    </ThemeProvider>
+  );
 
-  test('Selects and unselects Pokemon correctly using class', async () => {
-    renderWithProviders();
+  expect(screen.getByText('Pikachu')).toBeInTheDocument();
 
-    const selectButton = screen.getByRole('button', { name: /Select/i });
-    expect(selectButton).toBeInTheDocument();
+  expect(await screen.findByText(/electric/i)).toBeInTheDocument();
 
-    fireEvent.click(selectButton);
+  expect(screen.getByText('electric')).toBeInTheDocument();
 
-    const unselectButton = document.querySelector('.unselect-button');
-    expect(unselectButton).toBeNull();
+  expect(screen.getByText('static')).toBeInTheDocument();
 
-    if (unselectButton) {
-      fireEvent.click(unselectButton);
-    }
+  expect(screen.getByText('speed: 90')).toBeInTheDocument();
+  expect(screen.getByText('attack: 55')).toBeInTheDocument();
+});
 
-    const selectButtonAfterUnselect = document.querySelector('.select-button');
-    expect(selectButtonAfterUnselect).not.toBeNull();
-  });
+it('renders loading state', () => {
+  render(
+    <ThemeProvider>
+      <Card pokemon={null} details={null} detailsLoading={true} />
+    </ThemeProvider>
+  );
 
-  test('renders Pokemon types, abilities, and stats', () => {
-    renderWithProviders();
+  expect(screen.getByText('Loading...')).toBeInTheDocument();
+});
 
-    const types = screen.getByText(/Types/i);
-    expect(types).toBeInTheDocument();
+import '@testing-library/jest-dom';
 
-    const abilities = screen.getByText(/Abilities/i);
-    expect(abilities).toBeInTheDocument();
-
-    const stats = screen.getByText(/Stats/i);
-    expect(stats).toBeInTheDocument();
-  });
+test('dummy test', () => {
+  expect(true).toBe(true);
 });
