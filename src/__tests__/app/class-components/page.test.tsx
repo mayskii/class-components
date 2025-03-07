@@ -1,13 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import ClassComponents from '../../../../pages/class-components';
+import ClassComponents from '../../../../app/class-components/page';
 import '@testing-library/jest-dom';
 import { ThemeProvider } from '../../../context/ThemeProvider';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Provider } from 'react-redux';
 import { store } from '../../../store';
 
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
 
 describe('ClassComponents', () => {
@@ -16,6 +17,10 @@ describe('ClassComponents', () => {
       push: jest.fn(),
       query: {},
       pathname: '/',
+    });
+
+    (useSearchParams as jest.Mock).mockReturnValue({
+      get: jest.fn().mockReturnValue(null),
     });
 
     render(

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "jsx": "react-jsx",
     "esModuleInterop": true,
@@ -16,13 +16,19 @@
     ],
     "allowJs": true,
     "noEmit": true,
-    "incremental": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "jest.setup.js"
+    "jest.setup.ts",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

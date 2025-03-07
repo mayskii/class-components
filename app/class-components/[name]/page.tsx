@@ -6,9 +6,8 @@ import { useGetPokemonDetailsQuery } from '../../../src/servises/pokemonApi';
 import Card from '../../../components/Card';
 
 const CardPage = () => {
-  const { name } = useParams();
-
-  const pokemonName = typeof name === 'string' ? name : '';
+  const params = useParams() ?? {};
+  const pokemonName = typeof params.name === 'string' ? params.name : '';
 
   const {
     data: selectedPokemonData,

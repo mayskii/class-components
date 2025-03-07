@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import CardPage from '../../../../pages/class-components/[name]';
+import CardPage from '../../../../app/class-components/[name]/page';
 import '@testing-library/jest-dom';
 import { useRouter } from 'next/router';
 import { useGetPokemonDetailsQuery } from '../../../servises/pokemonApi';

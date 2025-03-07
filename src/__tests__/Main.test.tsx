@@ -8,14 +8,15 @@ import {
   pokemonApi,
   useGetPokemonDetailsQuery,
 } from '../servises/pokemonApi';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import selectedItemsReducer from '../selectedItemsSlice';
 import { Middleware, Action, Reducer } from '@reduxjs/toolkit';
 import { ThemeProvider } from '../context/ThemeProvider';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
 
 jest.mock('../servises/pokemonApi', () => ({
@@ -51,6 +52,10 @@ describe('Main Component', () => {
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
       query: {},
+    });
+
+    (useSearchParams as jest.Mock).mockReturnValue({
+      get: jest.fn().mockReturnValue(null),
     });
 
     (useGetPokemonListQuery as jest.Mock).mockReturnValue({
@@ -151,6 +156,7 @@ describe('Main Component', () => {
     fireEvent.click(screen.getByText('Pikachu'));
     expect(screen.queryByText('Pikachu')).toBeInTheDocument();
   });
+
   test('handles error button click and displays error message', () => {
     render(
       <Provider store={mockStore}>
@@ -168,6 +174,7 @@ describe('Main Component', () => {
     const errorMessage = screen.getByText(/Something went wrong!/i);
     expect(errorMessage).toBeInTheDocument();
   });
+
   test('downloads selected pokemon as CSV when clicking download button', () => {
     const createObjectURLMock = jest.fn();
     global.URL.createObjectURL = createObjectURLMock;

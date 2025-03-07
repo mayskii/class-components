@@ -1,8 +1,6 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from '../src/store';
-import ErrorBoundary from '../components/ErrorBoundary';
-import { ThemeProvider } from '../src/context/ThemeProvider';
+import ClientLayout from './ClientLayout';
+
 import '../styles/App.css';
 
 export default function RootLayout({
@@ -10,13 +8,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const resetError = () => {};
-
   return (
-    <ErrorBoundary resetError={resetError}>
-      <Provider store={store}>
-        <ThemeProvider>{children}</ThemeProvider>
-      </Provider>
-    </ErrorBoundary>
+    <html lang="en">
+      <head />
+      <body>
+        <ClientLayout>{children}</ClientLayout>{' '}
+      </body>
+    </html>
   );
 }

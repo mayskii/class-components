@@ -1,11 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import Pagination from '../../components/Pagination';
 import { ThemeProvider } from '../context/ThemeProvider';
 
-jest.mock('next/router', () => ({
+jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 

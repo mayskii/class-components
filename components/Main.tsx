@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CardList from './CardList';
 import Card from './Card';
 import Search from './Search';
@@ -48,6 +50,7 @@ const Main: React.FC<MainProps> = () => {
   const [hasError, setHasError] = useState<boolean>(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
 
   const selectedItems = useSelector(
@@ -69,21 +72,23 @@ const Main: React.FC<MainProps> = () => {
     );
 
   useEffect(() => {
-    const { search, page, id } = router.query;
+    const search = searchParams?.get('search') ?? '';
+    const page = searchParams?.get('page') ?? 1;
+    const id = searchParams?.get('id') ?? '';
 
-    if (typeof search === 'string' && search !== searchTerm) {
+    if (search && search !== searchTerm) {
       setSearchTerm(search);
     }
-    if (typeof page === 'string') {
+    if (page) {
       setCurrentPage(Number(page));
     }
-    if (typeof id === 'string') {
+    if (id) {
       setSelectedPokemon({
         name: id,
         url: `https://pokeapi.co/api/v2/pokemon/${id}/`,
       });
     }
-  }, [router.query, searchTerm, setSearchTerm]);
+  }, [searchParams, searchTerm, setSearchTerm]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
