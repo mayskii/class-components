@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev && node fix-tsconfig.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format:fix": "prettier --write .",
-    "postinstall": "husky install",
+    "postinstall": "node fix-tsconfig.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.1",
@@ -49,7 +50,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
